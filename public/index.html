@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gestão SAHL</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#0f1117;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#e2e8f0}
+
+  /* Header */
+  header{background:#1a1d2e;border-bottom:1px solid #2e3250;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
+  .logo-wrap{display:flex;align-items:center;gap:12px}
+  .logo{width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#22c55e);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
+  .logo-text{font-size:17px;font-weight:700;color:#e2e8f0}
+  .logo-sub{font-size:12px;color:#64748b;margin-top:1px}
+  .btn-logout{background:transparent;border:1px solid #2e3250;color:#94a3b8;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;transition:all .15s}
+  .btn-logout:hover{border-color:#ef4444;color:#ef4444}
+
+  /* Main */
+  main{max-width:960px;margin:0 auto;padding:48px 24px}
+  .section-title{font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px}
+
+  /* Grid de cards */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:48px}
+
+  .card{background:#1a1d2e;border:1px solid #2e3250;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px;cursor:pointer;text-decoration:none;color:inherit;transition:border-color .2s,transform .15s,box-shadow .2s}
+  .card:hover{border-color:#6366f1;transform:translateY(-2px);box-shadow:0 8px 32px rgba(99,102,241,.15)}
+
+  .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+  .card-icon.blue{background:rgba(59,130,246,.15);color:#3b82f6}
+  .card-icon.green{background:rgba(34,197,94,.15);color:#22c55e}
+  .card-icon.purple{background:rgba(99,102,241,.15);color:#6366f1}
+  .card-icon.amber{background:rgba(245,158,11,.15);color:#f59e0b}
+  .card-icon.rose{background:rgba(244,63,94,.15);color:#f43f5e}
+
+  .card-body{flex:1}
+  .card-name{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+  .card-desc{font-size:13px;color:#64748b;line-height:1.5}
+
+  .card-footer{display:flex;align-items:center;justify-content:space-between}
+  .badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px}
+  .badge.online{background:rgba(34,197,94,.15);color:#22c55e}
+  .badge.local{background:rgba(99,102,241,.15);color:#6366f1}
+  .badge.wip{background:rgba(245,158,11,.15);color:#f59e0b}
+  .card-arrow{color:#2e3250;font-size:18px;transition:color .2s}
+  .card:hover .card-arrow{color:#6366f1}
+
+  /* Divider */
+  .divider{border:none;border-top:1px solid #2e3250;margin:0 0 40px}
+
+  /* Empty card */
+  .card.add{border-style:dashed;cursor:default;opacity:.5}
+  .card.add:hover{border-color:#2e3250;transform:none;box-shadow:none}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <div class="logo">SG</div>
+    <div>
+      <div class="logo-text">Gestão SAHL</div>
+      <div class="logo-sub">Painel central de ferramentas</div>
+    </div>
+  </div>
+  <button class="btn-logout" onclick="location.href='/logout'">Sair</button>
+</header>
+
+<main>
+
+  <!-- Ferramentas online -->
+  <div class="section-title">Ferramentas ativas</div>
+  <div class="grid">
+
+    <a class="card" href="https://fluxo.sahl.com.br" target="_blank">
+      <div class="card-icon green">💰</div>
+      <div class="card-body">
+        <div class="card-name">Fluxo de Caixa</div>
+        <div class="card-desc">Previsão de recebimentos confirmados no Asaas, com breakdown de taxas, antecipações e split de professores.</div>
+      </div>
+      <div class="card-footer">
+        <span class="badge online">● Online</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://dashboard.sahl.com.br" target="_blank">
+      <div class="card-icon blue">💬</div>
+      <div class="card-body">
+        <div class="card-name">Dashboard WhatsApp</div>
+        <div class="card-desc">Painel de atendimento via WhatsApp (WAHA). Acompanhamento de conversas e status dos atendentes.</div>
+      </div>
+      <div class="card-footer">
+        <span class="badge online">● Online</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://auditoria.sahl.com.br" target="_blank">
+      <div class="card-icon rose">🔍</div>
+      <div class="card-body">
+        <div class="card-name">Auditoria Financeira</div>
+        <div class="card-desc">Relatório executivo de splits, problemas de repasse, extrato por professor e achados críticos cruzando split-sahl e Asaas.</div>
+      </div>
+      <div class="card-footer">
+        <span class="badge online">● Online</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://auditoria.sahl.com.br/fechamento" target="_blank">
+      <div class="card-icon amber">📊</div>
+      <div class="card-body">
+        <div class="card-name">Fechamento Mensal</div>
+        <div class="card-desc">Reconciliação completa EVO + Asaas + split-sahl: base ativa, churn real vs migração, MRR, split por professor e alertas operacionais.</div>
+      </div>
+      <div class="card-footer">
+        <span class="badge online">● Online</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+    <a class="card" href="https://posts.sahl.com.br" target="_blank">
+      <div class="card-icon amber">📸</div>
+      <div class="card-body">
+        <div class="card-name">Posts & Tráfego</div>
+        <div class="card-desc">Criador de posts com IA, plano de mídia com kanban e calendário, e gestão de campanhas Meta Ads.</div>
+      </div>
+      <div class="card-footer">
+        <span class="badge online">● Online</span>
+        <span class="card-arrow">→</span>
+      </div>
+    </a>
+
+  </div>
+
+  <hr class="divider">
+
+  <!-- Em breve -->
+  <div class="section-title">Próximas ferramentas</div>
+  <div class="grid">
+    <div class="card add">
+      <div class="card-icon purple">＋</div>
+      <div class="card-body">
+        <div class="card-name">Nova ferramenta</div>
+        <div class="card-desc">Novos projetos desenvolvidos aparecerão aqui automaticamente.</div>
+      </div>
+      <div class="card-footer">
+        <span class="badge wip">Em breve</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+</body>
+</html>
