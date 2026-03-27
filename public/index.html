@@ -6,153 +6,509 @@
 <title>Gestão SAHL</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{background:#0f1117;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#e2e8f0}
+  body{background:#090b12;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#e2e8f0;display:flex;height:100vh;overflow:hidden}
 
-  /* Header */
-  header{background:#1a1d2e;border-bottom:1px solid #2e3250;padding:0 32px;height:64px;display:flex;align-items:center;justify-content:space-between}
-  .logo-wrap{display:flex;align-items:center;gap:12px}
-  .logo{width:40px;height:40px;background:linear-gradient(135deg,#6366f1,#22c55e);border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:#fff;flex-shrink:0}
-  .logo-text{font-size:17px;font-weight:700;color:#e2e8f0}
-  .logo-sub{font-size:12px;color:#64748b;margin-top:1px}
-  .btn-logout{background:transparent;border:1px solid #2e3250;color:#94a3b8;border-radius:8px;padding:7px 16px;font-size:13px;cursor:pointer;transition:all .15s}
-  .btn-logout:hover{border-color:#ef4444;color:#ef4444}
+  /* ── Sidebar ── */
+  .sidebar{width:252px;min-width:252px;background:#0c0e1a;border-right:1px solid #1a1f35;display:flex;flex-direction:column;height:100vh;overflow-y:auto;overflow-x:hidden}
+  .sidebar::-webkit-scrollbar{width:4px}
+  .sidebar::-webkit-scrollbar-track{background:transparent}
+  .sidebar::-webkit-scrollbar-thumb{background:#1a1f35;border-radius:4px}
 
-  /* Main */
-  main{max-width:960px;margin:0 auto;padding:48px 24px}
-  .section-title{font-size:13px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px}
+  .sidebar-logo{padding:20px 18px 16px;display:flex;align-items:center;gap:11px;border-bottom:1px solid #1a1f35;flex-shrink:0}
+  .logo-mark{width:36px;height:36px;background:linear-gradient(135deg,#6366f1,#22c55e);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#fff;flex-shrink:0;letter-spacing:.3px;box-shadow:0 0 16px rgba(99,102,241,.25)}
+  .logo-text{font-size:15px;font-weight:700;color:#e2e8f0}
+  .logo-sub{font-size:11px;color:#3d4466;margin-top:1px}
 
-  /* Grid de cards */
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;margin-bottom:48px}
+  .nav{flex:1;padding:12px 10px}
+  .nav-group{margin-bottom:4px}
+  .nav-group-label{font-size:10px;font-weight:700;color:#3d4466;text-transform:uppercase;letter-spacing:.1em;padding:10px 8px 6px}
 
-  .card{background:#1a1d2e;border:1px solid #2e3250;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px;cursor:pointer;text-decoration:none;color:inherit;transition:border-color .2s,transform .15s,box-shadow .2s}
-  .card:hover{border-color:#6366f1;transform:translateY(-2px);box-shadow:0 8px 32px rgba(99,102,241,.15)}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;color:#64748b;font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;text-decoration:none}
+  .nav-item:hover{background:#131729;color:#cbd5e1}
+  .nav-item.active{background:#161c33;color:#e2e8f0}
+  .nav-icon{font-size:15px;width:20px;text-align:center;flex-shrink:0}
+  .nav-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .nav-dot{width:5px;height:5px;border-radius:50%;background:#22c55e;opacity:0;transition:opacity .2s;flex-shrink:0}
+  .nav-item.active .nav-dot{opacity:1}
 
-  .card-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
-  .card-icon.blue{background:rgba(59,130,246,.15);color:#3b82f6}
-  .card-icon.green{background:rgba(34,197,94,.15);color:#22c55e}
-  .card-icon.purple{background:rgba(99,102,241,.15);color:#6366f1}
-  .card-icon.amber{background:rgba(245,158,11,.15);color:#f59e0b}
-  .card-icon.rose{background:rgba(244,63,94,.15);color:#f43f5e}
+  /* ── Relatórios na sidebar ── */
+  .dl-group-header{display:flex;align-items:center;justify-content:space-between;padding:10px 8px 4px}
+  .dl-group-header .nav-group-label{padding:0}
+  .btn-add-dl{background:none;border:none;color:#3d4466;cursor:pointer;font-size:15px;padding:2px 4px;border-radius:4px;transition:color .15s;line-height:1}
+  .btn-add-dl:hover{color:#818cf8}
 
-  .card-body{flex:1}
-  .card-name{font-size:16px;font-weight:700;color:#e2e8f0;margin-bottom:4px}
-  .card-desc{font-size:13px;color:#64748b;line-height:1.5}
+  .dl-item{position:relative;display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;color:#3d4466;font-size:12.5px;font-weight:500;border:none;background:none;width:100%;text-align:left;transition:background .15s,color .15s}
+  .dl-item:hover{background:#131729;color:#818cf8}
+  .dl-item.active{background:#161c33;color:#a5b4fc}
+  .dl-item-icon{font-size:13px;flex-shrink:0}
+  .dl-item-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dl-badge{font-size:10px;background:rgba(99,102,241,.15);color:#818cf8;padding:1px 7px;border-radius:4px;font-weight:600;flex-shrink:0}
+  .dl-item-actions{display:none;gap:2px;flex-shrink:0}
+  .dl-item:hover .dl-item-actions{display:flex}
+  .dl-act{background:none;border:none;cursor:pointer;font-size:12px;color:#3d4466;padding:2px 4px;border-radius:4px;transition:color .15s;line-height:1}
+  .dl-act:hover{color:#94a3b8}
+  .dl-act.archive:hover{color:#f59e0b}
+  .dl-act.del:hover{color:#ef4444}
 
-  .card-footer{display:flex;align-items:center;justify-content:space-between}
-  .badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px}
-  .badge.online{background:rgba(34,197,94,.15);color:#22c55e}
-  .badge.local{background:rgba(99,102,241,.15);color:#6366f1}
-  .badge.wip{background:rgba(245,158,11,.15);color:#f59e0b}
-  .card-arrow{color:#2e3250;font-size:18px;transition:color .2s}
-  .card:hover .card-arrow{color:#6366f1}
+  /* Arquivados */
+  .archived-toggle{display:flex;align-items:center;gap:6px;padding:8px 8px 4px;cursor:pointer;color:#2a3050;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;border:none;background:none;width:100%}
+  .archived-toggle:hover{color:#3d4466}
+  .archived-toggle .chevron{transition:transform .2s;font-style:normal}
+  .archived-section{overflow:hidden;transition:max-height .25s}
+  .dl-item.archived{color:#2a3050;font-style:italic}
+  .dl-item.archived:hover{color:#3d4466}
+  .dl-act.restore:hover{color:#22c55e}
 
-  /* Divider */
-  .divider{border:none;border-top:1px solid #2e3250;margin:0 0 40px}
+  /* Sidebar footer */
+  .sidebar-footer{padding:12px 10px;border-top:1px solid #1a1f35;flex-shrink:0}
+  .btn-logout{display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;border-radius:8px;background:none;border:none;color:#3d4466;font-size:13px;cursor:pointer;transition:all .2s;text-align:left}
+  .btn-logout:hover{background:#1a0f0f;color:#ef4444}
 
-  /* Empty card */
-  .card.add{border-style:dashed;cursor:default;opacity:.5}
-  .card.add:hover{border-color:#2e3250;transform:none;box-shadow:none}
+  /* ── Main ── */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;height:100vh}
+
+  /* Welcome */
+  .welcome{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;overflow-y:auto}
+  .welcome-title{font-size:26px;font-weight:700;color:#e2e8f0;margin-bottom:8px;text-align:center}
+  .welcome-sub{font-size:14px;color:#3d4466;text-align:center;margin-bottom:48px}
+  .welcome-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;width:100%;max-width:780px}
+  .wcard{background:#0c0e1a;border:1px solid #1a1f35;border-radius:12px;padding:18px;cursor:pointer;transition:border-color .2s,transform .18s,box-shadow .2s;display:flex;flex-direction:column;gap:10px}
+  .wcard:hover{border-color:#2a3060;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.3)}
+  .wcard-top{display:flex;align-items:center;gap:10px}
+  .wcard-icon{font-size:18px;width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .wcard-icon.green{background:rgba(34,197,94,.1)}
+  .wcard-icon.blue{background:rgba(59,130,246,.1)}
+  .wcard-icon.rose{background:rgba(244,63,94,.1)}
+  .wcard-icon.amber{background:rgba(245,158,11,.1)}
+  .wcard-icon.purple{background:rgba(139,92,246,.1)}
+  .wcard-name{font-size:13.5px;font-weight:700;color:#cbd5e1}
+  .wcard-desc{font-size:12px;color:#3d4466;line-height:1.5}
+
+  /* Preview iframe */
+  .preview{flex:1;display:none;flex-direction:column;min-height:0}
+  .preview.active{display:flex}
+  .preview-bar{height:52px;min-height:52px;background:#0c0e1a;border-bottom:1px solid #1a1f35;display:flex;align-items:center;padding:0 20px;gap:14px}
+  .preview-icon{font-size:17px;flex-shrink:0}
+  .preview-title{font-size:14px;font-weight:600;color:#cbd5e1;flex:1}
+  .preview-url{font-size:11px;color:#3d4466}
+  .btn-open{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#818cf8;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;white-space:nowrap}
+  .btn-open:hover{background:rgba(99,102,241,.22);color:#a5b4fc;border-color:#6366f1}
+  .btn-close{background:none;border:none;color:#3d4466;font-size:18px;cursor:pointer;padding:4px 8px;border-radius:6px;transition:all .15s;line-height:1}
+  .btn-close:hover{background:#1a1f35;color:#94a3b8}
+  .preview-frame{flex:1;border:none;background:#090b12;min-height:0}
+
+  /* Preview download */
+  .preview-dl{flex:1;display:none;flex-direction:column;min-height:0}
+  .preview-dl.active{display:flex}
+  .dl-preview-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:40px}
+  .dl-preview-icon{font-size:52px;opacity:.35}
+  .dl-preview-name{font-size:20px;font-weight:700;color:#cbd5e1}
+  .dl-preview-desc{font-size:13px;color:#475569;text-align:center;max-width:420px;line-height:1.7}
+  .dl-preview-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+  .dl-meta-pill{font-size:11.5px;background:#0f1220;border:1px solid #1a1f35;padding:4px 12px;border-radius:20px;color:#475569}
+  .btn-dl-big{display:inline-flex;align-items:center;gap:8px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#818cf8;border-radius:10px;padding:12px 32px;font-size:14px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s;margin-top:8px}
+  .btn-dl-big:hover{background:rgba(99,102,241,.22);color:#a5b4fc;border-color:#6366f1;transform:translateY(-1px)}
+
+  /* ── Modal ── */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+  .modal-backdrop.open{display:flex}
+  .modal{background:#0f1220;border:1px solid #1a1f35;border-radius:16px;padding:28px;width:100%;max-width:460px;display:flex;flex-direction:column;gap:18px}
+  .modal-title{font-size:16px;font-weight:700;color:#e2e8f0}
+  .modal-field{display:flex;flex-direction:column;gap:6px}
+  .modal-label{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em}
+  .modal-input{background:#090b12;border:1px solid #1a1f35;color:#e2e8f0;border-radius:8px;padding:9px 12px;font-size:13px;outline:none;font-family:inherit;transition:border-color .15s}
+  .modal-input:focus{border-color:#6366f1}
+  textarea.modal-input{resize:vertical;min-height:70px}
+  .modal-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+  .btn-cancel{background:none;border:1px solid #1a1f35;color:#475569;border-radius:8px;padding:8px 18px;font-size:13px;cursor:pointer;transition:all .15s}
+  .btn-cancel:hover{border-color:#2e3450;color:#94a3b8}
+  .btn-save{background:#6366f1;border:none;color:#fff;border-radius:8px;padding:8px 20px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .15s}
+  .btn-save:hover{opacity:.85}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="logo-wrap">
-    <div class="logo">SG</div>
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+
+  <div class="sidebar-logo">
+    <div class="logo-mark">SAHL</div>
     <div>
       <div class="logo-text">Gestão SAHL</div>
-      <div class="logo-sub">Painel central de ferramentas</div>
-    </div>
-  </div>
-  <button class="btn-logout" onclick="location.href='/logout'">Sair</button>
-</header>
-
-<main>
-
-  <!-- Ferramentas online -->
-  <div class="section-title">Ferramentas ativas</div>
-  <div class="grid">
-
-    <a class="card" href="https://fluxo.sahl.com.br" target="_blank">
-      <div class="card-icon green">💰</div>
-      <div class="card-body">
-        <div class="card-name">Fluxo de Caixa</div>
-        <div class="card-desc">Previsão de recebimentos confirmados no Asaas, com breakdown de taxas, antecipações e split de professores.</div>
-      </div>
-      <div class="card-footer">
-        <span class="badge online">● Online</span>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-    <a class="card" href="https://dashboard.sahl.com.br" target="_blank">
-      <div class="card-icon blue">💬</div>
-      <div class="card-body">
-        <div class="card-name">Dashboard WhatsApp</div>
-        <div class="card-desc">Painel de atendimento via WhatsApp (WAHA). Acompanhamento de conversas e status dos atendentes.</div>
-      </div>
-      <div class="card-footer">
-        <span class="badge online">● Online</span>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-    <a class="card" href="https://auditoria.sahl.com.br" target="_blank">
-      <div class="card-icon rose">🔍</div>
-      <div class="card-body">
-        <div class="card-name">Auditoria Financeira</div>
-        <div class="card-desc">Relatório executivo de splits, problemas de repasse, extrato por professor e achados críticos cruzando split-sahl e Asaas.</div>
-      </div>
-      <div class="card-footer">
-        <span class="badge online">● Online</span>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-    <a class="card" href="https://auditoria.sahl.com.br/fechamento" target="_blank">
-      <div class="card-icon amber">📊</div>
-      <div class="card-body">
-        <div class="card-name">Fechamento Mensal</div>
-        <div class="card-desc">Reconciliação completa EVO + Asaas + split-sahl: base ativa, churn real vs migração, MRR, split por professor e alertas operacionais.</div>
-      </div>
-      <div class="card-footer">
-        <span class="badge online">● Online</span>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-    <a class="card" href="https://posts.sahl.com.br" target="_blank">
-      <div class="card-icon amber">📸</div>
-      <div class="card-body">
-        <div class="card-name">Posts & Tráfego</div>
-        <div class="card-desc">Criador de posts com IA, plano de mídia com kanban e calendário, e gestão de campanhas Meta Ads.</div>
-      </div>
-      <div class="card-footer">
-        <span class="badge online">● Online</span>
-        <span class="card-arrow">→</span>
-      </div>
-    </a>
-
-  </div>
-
-  <hr class="divider">
-
-  <!-- Em breve -->
-  <div class="section-title">Próximas ferramentas</div>
-  <div class="grid">
-    <div class="card add">
-      <div class="card-icon purple">＋</div>
-      <div class="card-body">
-        <div class="card-name">Nova ferramenta</div>
-        <div class="card-desc">Novos projetos desenvolvidos aparecerão aqui automaticamente.</div>
-      </div>
-      <div class="card-footer">
-        <span class="badge wip">Em breve</span>
-      </div>
+      <div class="logo-sub">Central de ferramentas</div>
     </div>
   </div>
 
-</main>
+  <nav class="nav">
+
+    <div class="nav-group">
+      <div class="nav-group-label">Financeiro</div>
+      <button class="nav-item" onclick="openTool(this,'https://fluxo.sahl.com.br','💰','Fluxo de Caixa')">
+        <span class="nav-icon">💰</span><span class="nav-name">Fluxo de Caixa</span><span class="nav-dot"></span>
+      </button>
+      <button class="nav-item" onclick="openTool(this,'https://auditoria.sahl.com.br','🔍','Auditoria Financeira')">
+        <span class="nav-icon">🔍</span><span class="nav-name">Auditoria Financeira</span><span class="nav-dot"></span>
+      </button>
+      <button class="nav-item" onclick="openTool(this,'https://auditoria.sahl.com.br/fechamento','📊','Fechamento Mensal')">
+        <span class="nav-icon">📊</span><span class="nav-name">Fechamento Mensal</span><span class="nav-dot"></span>
+      </button>
+      <button class="nav-item" onclick="openTool(this,'https://auditoria.sahl.com.br/alunos','🎓','Alunos / Pagamentos')">
+        <span class="nav-icon">🎓</span><span class="nav-name">Alunos / Pagamentos</span><span class="nav-dot"></span>
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Operacional</div>
+      <button class="nav-item" onclick="openTool(this,'https://dashboard.sahl.com.br','💬','Dashboard WhatsApp')">
+        <span class="nav-icon">💬</span><span class="nav-name">Dashboard WhatsApp</span><span class="nav-dot"></span>
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-label">Marketing</div>
+      <button class="nav-item" onclick="openTool(this,'https://posts.sahl.com.br','📸','Posts & Tráfego')">
+        <span class="nav-icon">📸</span><span class="nav-name">Posts & Tráfego</span><span class="nav-dot"></span>
+      </button>
+    </div>
+
+    <!-- Relatórios dinâmicos -->
+    <div class="nav-group">
+      <div class="dl-group-header">
+        <span class="nav-group-label">Relatórios</span>
+        <button class="btn-add-dl" onclick="openModal()" title="Adicionar relatório">＋</button>
+      </div>
+      <div id="dl-list"></div>
+
+      <button class="archived-toggle" onclick="toggleArchived()" id="archived-btn">
+        <span class="chevron" id="archived-chevron">▶</span>
+        <span>Arquivados</span>
+        <span id="archived-count" style="margin-left:auto;font-size:10px;background:rgba(255,255,255,.05);padding:1px 6px;border-radius:4px"></span>
+      </button>
+      <div class="archived-section" id="archived-section" style="max-height:0">
+        <div id="archived-list"></div>
+      </div>
+    </div>
+
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="btn-logout" onclick="location.href='/logout'">
+      <span>⎋</span> Sair
+    </button>
+  </div>
+
+</aside>
+
+<!-- ── Main ── -->
+<div class="main" id="main">
+
+  <!-- Welcome -->
+  <div class="welcome" id="welcome">
+    <div class="welcome-title">Central de Gestão</div>
+    <div class="welcome-sub">Selecione uma ferramenta no menu lateral</div>
+    <div class="welcome-grid">
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Fluxo\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon green">💰</div><div class="wcard-name">Fluxo de Caixa</div></div>
+        <div class="wcard-desc">Recebimentos, antecipações e split por professor.</div>
+      </div>
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Auditoria Financeira\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon rose">🔍</div><div class="wcard-name">Auditoria Financeira</div></div>
+        <div class="wcard-desc">Splits, repasses e achados críticos.</div>
+      </div>
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Fechamento\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon amber">📊</div><div class="wcard-name">Fechamento Mensal</div></div>
+        <div class="wcard-desc">Reconciliação EVO + Asaas + split-sahl.</div>
+      </div>
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Alunos\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon purple">🎓</div><div class="wcard-name">Alunos / Pagamentos</div></div>
+        <div class="wcard-desc">500+ alunos, contratos e cobranças.</div>
+      </div>
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"WhatsApp\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon blue">💬</div><div class="wcard-name">Dashboard WhatsApp</div></div>
+        <div class="wcard-desc">Atendimento WAHA e status dos atendentes.</div>
+      </div>
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Posts\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon amber">📸</div><div class="wcard-name">Posts & Tráfego</div></div>
+        <div class="wcard-desc">Posts com IA, kanban e campanhas Meta.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview iframe -->
+  <div class="preview" id="preview">
+    <div class="preview-bar">
+      <span class="preview-icon" id="preview-icon"></span>
+      <span class="preview-title" id="preview-title"></span>
+      <span class="preview-url" id="preview-url"></span>
+      <a class="btn-open" id="btn-open" href="#" target="_blank">Abrir em nova aba ↗</a>
+      <button class="btn-close" onclick="closePreview()">✕</button>
+    </div>
+    <iframe class="preview-frame" id="preview-frame" src="about:blank"></iframe>
+  </div>
+
+  <!-- Preview download -->
+  <div class="preview-dl" id="preview-dl">
+    <div class="preview-bar">
+      <span class="preview-icon" id="dl-prev-icon"></span>
+      <span class="preview-title" id="dl-prev-title"></span>
+      <span class="preview-url" id="dl-prev-tag" style="font-size:11px;background:rgba(99,102,241,.1);color:#818cf8;padding:2px 8px;border-radius:4px"></span>
+      <button class="btn-close" onclick="closePreview()">✕</button>
+    </div>
+    <div class="dl-preview-body">
+      <div class="dl-preview-icon" id="dl-prev-big-icon"></div>
+      <div class="dl-preview-name" id="dl-prev-big-name"></div>
+      <div class="dl-preview-desc" id="dl-prev-big-desc"></div>
+      <div class="dl-preview-meta" id="dl-prev-meta"></div>
+      <a class="btn-dl-big" id="dl-prev-btn" href="#" target="_blank">⬇ Baixar CSV</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Modal: adicionar / editar relatório ── -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal-title">Novo Relatório</div>
+    <input type="hidden" id="modal-id">
+
+    <div class="modal-field">
+      <label class="modal-label">Nome</label>
+      <input class="modal-input" id="modal-name" placeholder="Ex: Cobranças — Março 2026">
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Descrição</label>
+      <textarea class="modal-input" id="modal-desc" placeholder="O que este relatório contém?"></textarea>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">URL de download</label>
+      <input class="modal-input" id="modal-url" placeholder="https://auditoria.sahl.com.br/download/...">
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label class="modal-label">Tag / Categoria</label>
+        <input class="modal-input" id="modal-tag" placeholder="Ex: Alunos">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Badge (contagem)</label>
+        <input class="modal-input" id="modal-badge" placeholder="Ex: 77">
+      </div>
+    </div>
+    <div class="modal-row">
+      <div class="modal-field">
+        <label class="modal-label">Ícone (emoji)</label>
+        <input class="modal-input" id="modal-icon" placeholder="📋">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Nome do arquivo</label>
+        <input class="modal-input" id="modal-filename" placeholder="relatorio.csv">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveModal()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let activeNav = null;
+let downloads  = [];
+let archivedOpen = false;
+let currentDlId  = null;
+
+// ── Carregar relatórios ──────────────────────────────────────────────────────
+async function loadDownloads() {
+  downloads = await fetch('/api/downloads').then(r => r.json());
+  renderDownloads();
+}
+
+function fmtDate(iso) {
+  if (!iso) return '';
+  const d = new Date(iso);
+  return d.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' às ' + d.toLocaleTimeString('pt-BR', { hour:'2-digit', minute:'2-digit' });
+}
+
+function renderDownloads() {
+  const active   = downloads.filter(d => !d.archived);
+  const archived = downloads.filter(d =>  d.archived);
+
+  document.getElementById('dl-list').innerHTML = active.map(d => `
+    <button class="dl-item${currentDlId===d.id?' active':''}" onclick="openDownload('${d.id}')">
+      <span class="dl-item-icon">${d.icon||'📋'}</span>
+      <span class="dl-item-name">${d.name}</span>
+      ${d.badge ? `<span class="dl-badge">${d.badge}</span>` : ''}
+      <span class="dl-item-actions">
+        <span class="dl-act" onclick="event.stopPropagation();editDownload('${d.id}')" title="Editar">✎</span>
+        <span class="dl-act archive" onclick="event.stopPropagation();archiveDownload('${d.id}')" title="Arquivar">⊡</span>
+      </span>
+    </button>`).join('');
+
+  document.getElementById('archived-list').innerHTML = archived.map(d => `
+    <button class="dl-item archived${currentDlId===d.id?' active':''}" onclick="openDownload('${d.id}')">
+      <span class="dl-item-icon">${d.icon||'📋'}</span>
+      <span class="dl-item-name">${d.name}</span>
+      <span class="dl-item-actions">
+        <span class="dl-act restore" onclick="event.stopPropagation();restoreDownload('${d.id}')" title="Restaurar">↩</span>
+        <span class="dl-act del" onclick="event.stopPropagation();deleteDownload('${d.id}')" title="Excluir permanentemente">🗑</span>
+      </span>
+    </button>`).join('');
+
+  const cnt = document.getElementById('archived-count');
+  cnt.textContent = archived.length ? archived.length : '';
+  cnt.style.display = archived.length ? '' : 'none';
+}
+
+// ── Navegação ────────────────────────────────────────────────────────────────
+function setActive(el) {
+  if (activeNav) activeNav.classList.remove('active');
+  if (el) { el.classList.add('active'); activeNav = el; }
+  else activeNav = null;
+}
+
+function openTool(el, url, icon, title) {
+  setActive(el);
+  currentDlId = null;
+  renderDownloads();
+  document.getElementById('welcome').style.display    = 'none';
+  document.getElementById('preview-dl').classList.remove('active');
+  document.getElementById('preview').classList.add('active');
+  document.getElementById('preview-icon').textContent = icon;
+  document.getElementById('preview-title').textContent = title;
+  document.getElementById('preview-url').textContent  = url;
+  document.getElementById('btn-open').href = url;
+  document.getElementById('preview-frame').src = url;
+}
+
+function openDownload(id) {
+  const d = downloads.find(x => x.id === id);
+  if (!d) return;
+  currentDlId = id;
+  // Marca item ativo — encontra o botão pelo id
+  const btn = [...document.querySelectorAll('.dl-item')].find(b => b.getAttribute('onclick') === `openDownload('${id}')`);
+  setActive(btn || null);
+  renderDownloads();
+
+  document.getElementById('welcome').style.display   = 'none';
+  document.getElementById('preview').classList.remove('active');
+  document.getElementById('preview-dl').classList.add('active');
+
+  document.getElementById('dl-prev-icon').textContent     = d.icon || '📋';
+  document.getElementById('dl-prev-title').textContent    = d.name;
+  document.getElementById('dl-prev-tag').textContent      = d.tag || '';
+  document.getElementById('dl-prev-big-icon').textContent = d.icon || '📋';
+  document.getElementById('dl-prev-big-name').textContent = d.name;
+  document.getElementById('dl-prev-big-desc').textContent = d.description || '';
+
+  const meta = [];
+  if (d.badge)     meta.push(`<span class="dl-meta-pill">${d.badge} registros</span>`);
+  if (d.createdAt) meta.push(`<span class="dl-meta-pill">Adicionado em ${fmtDate(d.createdAt)}</span>`);
+  if (d.archived && d.archivedAt) meta.push(`<span class="dl-meta-pill" style="color:#f59e0b">Arquivado em ${fmtDate(d.archivedAt)}</span>`);
+  document.getElementById('dl-prev-meta').innerHTML = meta.join('');
+
+  document.getElementById('dl-prev-btn').href = d.url;
+  document.getElementById('dl-prev-btn').setAttribute('download', d.filename || '');
+  // Oculta botão de download em arquivados
+  document.getElementById('dl-prev-btn').style.display = d.archived ? 'none' : 'inline-flex';
+}
+
+function closePreview() {
+  setActive(null);
+  currentDlId = null;
+  renderDownloads();
+  document.getElementById('preview').classList.remove('active');
+  document.getElementById('preview-dl').classList.remove('active');
+  document.getElementById('preview-frame').src = 'about:blank';
+  document.getElementById('welcome').style.display = 'flex';
+}
+
+// ── Arquivar / restaurar / excluir ───────────────────────────────────────────
+async function archiveDownload(id) {
+  await fetch('/api/downloads/' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ archived: true }) });
+  if (currentDlId === id) closePreview();
+  await loadDownloads();
+}
+
+async function restoreDownload(id) {
+  await fetch('/api/downloads/' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ archived: false }) });
+  await loadDownloads();
+}
+
+async function deleteDownload(id) {
+  if (!confirm('Excluir permanentemente este relatório?')) return;
+  await fetch('/api/downloads/' + id, { method:'DELETE' });
+  if (currentDlId === id) closePreview();
+  await loadDownloads();
+}
+
+// ── Toggle arquivados ────────────────────────────────────────────────────────
+function toggleArchived() {
+  archivedOpen = !archivedOpen;
+  const sec  = document.getElementById('archived-section');
+  const chev = document.getElementById('archived-chevron');
+  if (archivedOpen) {
+    sec.style.maxHeight = sec.scrollHeight + 'px';
+    chev.textContent = '▾';
+  } else {
+    sec.style.maxHeight = '0';
+    chev.textContent = '▶';
+  }
+}
+
+// ── Modal ────────────────────────────────────────────────────────────────────
+function openModal(id) {
+  const d = id ? downloads.find(x => x.id === id) : null;
+  document.getElementById('modal-title').textContent = d ? 'Editar Relatório' : 'Novo Relatório';
+  document.getElementById('modal-id').value       = d ? d.id : '';
+  document.getElementById('modal-name').value     = d ? d.name : '';
+  document.getElementById('modal-desc').value     = d ? (d.description||'') : '';
+  document.getElementById('modal-url').value      = d ? d.url : '';
+  document.getElementById('modal-tag').value      = d ? (d.tag||'') : '';
+  document.getElementById('modal-badge').value    = d ? (d.badge||'') : '';
+  document.getElementById('modal-icon').value     = d ? (d.icon||'📋') : '📋';
+  document.getElementById('modal-filename').value = d ? (d.filename||'') : '';
+  document.getElementById('modal').classList.add('open');
+  document.getElementById('modal-name').focus();
+}
+
+function editDownload(id) { openModal(id); }
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+
+async function saveModal() {
+  const id   = document.getElementById('modal-id').value;
+  const body = {
+    name:        document.getElementById('modal-name').value.trim(),
+    description: document.getElementById('modal-desc').value.trim(),
+    url:         document.getElementById('modal-url').value.trim(),
+    tag:         document.getElementById('modal-tag').value.trim(),
+    badge:       document.getElementById('modal-badge').value.trim(),
+    icon:        document.getElementById('modal-icon').value.trim() || '📋',
+    filename:    document.getElementById('modal-filename').value.trim(),
+  };
+  if (!body.name || !body.url) { alert('Nome e URL são obrigatórios.'); return; }
+
+  if (id) {
+    await fetch('/api/downloads/' + id, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  } else {
+    await fetch('/api/downloads', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+  }
+  closeModal();
+  await loadDownloads();
+  // Re-abre o preview se estava aberto
+  if (id && currentDlId === id) openDownload(id);
+}
+
+// Fecha modal clicando fora
+document.getElementById('modal').addEventListener('click', e => { if (e.target === document.getElementById('modal')) closeModal(); });
+// Esc fecha modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+loadDownloads();
+</script>
 
 </body>
 </html>

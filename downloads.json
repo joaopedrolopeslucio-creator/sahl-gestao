@@ -1,0 +1,41 @@
+[
+  {
+    "id": "dl-nunca-pagou",
+    "name": "Cobranças — Nunca Pagaram",
+    "description": "77 alunos com cartão nunca cadastrado. Inclui nome, plano, valor, meses em atraso, e-mail, telefone e link de cobrança.",
+    "url": "https://auditoria.sahl.com.br/download/cobranca-nunca-pagou",
+    "filename": "cobranca_nunca_pagou.csv",
+    "tag": "Alunos",
+    "badge": "77",
+    "icon": "📋",
+    "createdAt": "2026-03-26T12:00:00.000Z",
+    "archived": false,
+    "archivedAt": null
+  },
+  {
+    "id": "dl-parou-pagar",
+    "name": "Cobranças — Pararam de Pagar",
+    "description": "32 alunos que pagaram em fevereiro mas falharam em março. Inclui nome, plano, valor, e-mail, telefone e link de cobrança.",
+    "url": "https://auditoria.sahl.com.br/download/cobranca-parou-pagar",
+    "filename": "cobranca_parou_pagar.csv",
+    "tag": "Alunos",
+    "badge": "32",
+    "icon": "📋",
+    "createdAt": "2026-03-26T12:00:00.000Z",
+    "archived": false,
+    "archivedAt": null
+  },
+  {
+    "id": "dl-vencidas-detalhe",
+    "name": "Vencidas — Por Cobrança",
+    "description": "120 cobranças vencidas de 74 alunos (R$29.325,50). Uma linha por cobrança com link individual de pagamento. Ideal para cobrança mês a mês.",
+    "url": "https://auditoria.sahl.com.br/download/cobranças-vencidas-detalhado",
+    "filename": "cobranças_vencidas_detalhado.csv",
+    "tag": "Alunos",
+    "badge": "120",
+    "icon": "🔗",
+    "createdAt": "2026-03-26T12:00:00.000Z",
+    "archived": false,
+    "archivedAt": null
+  }
+]

@@ -1,14 +1,25 @@
 const express = require('../waha-dashboard/node_modules/express');
 const crypto  = require('crypto');
 const path    = require('path');
+const fs      = require('fs');
 const app     = express();
 const PORT    = 3012;
 
 const SENHA  = 'sahl2026';
 const TOKEN  = crypto.createHash('sha256').update(SENHA + 'gestao-sahl-secret').digest('hex');
 const COOKIE = 'gestao_auth';
+const DL_FILE = path.join(__dirname, 'downloads.json');
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+// ─── Downloads helpers ────────────────────────────────────────────────────────
+function readDownloads() {
+  try { return JSON.parse(fs.readFileSync(DL_FILE, 'utf8')); } catch { return []; }
+}
+function writeDownloads(data) {
+  fs.writeFileSync(DL_FILE, JSON.stringify(data, null, 2));
+}
 
 function isAuth(req) {
   const cookie = req.headers.cookie || '';
@@ -66,6 +77,52 @@ app.use((req, res, next) => {
   if (req.path === '/login' || req.path === '/logout') return next();
   if (!isAuth(req)) return res.redirect('/login');
   next();
+});
+
+// ─── Downloads API ────────────────────────────────────────────────────────────
+app.get('/api/downloads', (req, res) => {
+  res.json(readDownloads());
+});
+
+app.post('/api/downloads', (req, res) => {
+  const list = readDownloads();
+  const item = {
+    id: 'dl-' + Date.now(),
+    name: req.body.name || 'Sem nome',
+    description: req.body.description || '',
+    url: req.body.url || '',
+    filename: req.body.filename || '',
+    tag: req.body.tag || '',
+    badge: req.body.badge || '',
+    icon: req.body.icon || '📋',
+    createdAt: new Date().toISOString(),
+    archived: false,
+    archivedAt: null,
+  };
+  list.push(item);
+  writeDownloads(list);
+  res.json(item);
+});
+
+app.patch('/api/downloads/:id', (req, res) => {
+  const list = readDownloads();
+  const idx  = list.findIndex(d => d.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'not found' });
+  const item = { ...list[idx], ...req.body };
+  if (req.body.archived === true  && !list[idx].archived) item.archivedAt = new Date().toISOString();
+  if (req.body.archived === false) item.archivedAt = null;
+  list[idx] = item;
+  writeDownloads(list);
+  res.json(item);
+});
+
+app.delete('/api/downloads/:id', (req, res) => {
+  const list = readDownloads();
+  const idx  = list.findIndex(d => d.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'not found' });
+  list.splice(idx, 1);
+  writeDownloads(list);
+  res.json({ ok: true });
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
