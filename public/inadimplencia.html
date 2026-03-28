@@ -139,15 +139,11 @@ function renderTabela() {
   var html = '<table><thead><tr>' +
     '<th>#</th><th>Nome</th><th>CPF</th>' +
     (isFantasma ? '<th>Status EVO</th>' : '') +
-    '<th>Meses devedores</th><th>Cobranças</th><th>Total</th>' +
+    '<th>Vencimento(s)</th><th>Cobranças</th><th>Total</th>' +
     '</tr></thead><tbody>';
 
   rows.forEach(function(r, i) {
     var acum = r.meses.length > 1;
-    var mesesStr = r.meses.map(function(m){
-      var parts = m.split('-');
-      return parts[1] + '/' + parts[0].slice(2);
-    }).join(', ');
     var tag = acum ? '<span class="tag-acum">acumulado</span>' : '<span class="tag-mar">só este mês</span>';
     var statusBadge = '';
     if (isFantasma) {
@@ -155,12 +151,20 @@ function renderTabela() {
       var sl = r.evoStatus === 'Suspended' ? 'Suspenso' : 'Inativo';
       statusBadge = '<td><span class="badge ' + sc + '">' + sl + '</span></td>';
     }
+    // Format each due date as dd/mm/yy
+    var vencDates = r.cobras
+      .map(function(c){ return c.venc; })
+      .sort()
+      .map(function(v){
+        var p = v.split('-');
+        return p[2] + '/' + p[1] + '/' + p[0].slice(2);
+      }).join('<br>');
     html += '<tr>' +
       '<td class="cobr-count">' + (i+1) + '</td>' +
-      '<td>' + esc(r.nome) + ' ' + (!isFantasma ? tag : '') + '</td>' +
+      '<td>' + esc(r.nome) + ' ' + tag + '</td>' +
       '<td class="meses">' + r.cpf + '</td>' +
       statusBadge +
-      '<td class="meses">' + mesesStr + (isFantasma ? ' ' + tag : '') + '</td>' +
+      '<td class="meses" style="line-height:1.7">' + vencDates + '</td>' +
       '<td class="cobr-count">' + r.cobras.length + 'x</td>' +
       '<td class="valor">R$ ' + r.total.toFixed(2).replace('.',',') + '</td>' +
       '</tr>';
