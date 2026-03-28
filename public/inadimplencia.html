@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inadimplência — SAHL</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#090b12;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#e2e8f0;padding:24px}
+  h1{font-size:18px;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+  .subtitle{font-size:12px;color:#475569;margin-bottom:20px}
+
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px 18px}
+  .card-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+  .card-value{font-size:22px;font-weight:700;color:#e2e8f0}
+  .card-sub{font-size:11px;color:#475569;margin-top:3px}
+  .card.danger .card-value{color:#ef4444}
+  .card.warn .card-value{color:#f59e0b}
+  .card.ok .card-value{color:#22c55e}
+
+  .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+  .tabs{display:flex;gap:2px;background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:3px}
+  .tab{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s}
+  .tab.active{background:#1e293b;color:#e2e8f0}
+  .search{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px;color:#e2e8f0;outline:none;width:220px}
+  .search:focus{border-color:#6366f1}
+  .btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s}
+  .btn:hover{opacity:.85}
+  .btn-green{background:#166534;color:#bbf7d0}
+  .btn-blue{background:#1e3a5f;color:#93c5fd}
+  .btn-gray{background:#1e293b;border:1px solid #334155;color:#94a3b8}
+  .ml-auto{margin-left:auto}
+  .upd{font-size:11px;color:#334155}
+
+  table{width:100%;border-collapse:collapse;font-size:12.5px}
+  th{text-align:left;padding:9px 12px;border-bottom:1px solid #1e293b;color:#475569;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
+  td{padding:9px 12px;border-bottom:1px solid #0f172a;vertical-align:middle}
+  tr:hover td{background:#0f172a55}
+  .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
+  .badge-inactive{background:#3f1a1a;color:#fca5a5}
+  .badge-suspended{background:#3f2a00;color:#fcd34d}
+  .meses{color:#94a3b8;font-size:11px}
+  .valor{font-weight:700;color:#e2e8f0}
+  .cobr-count{color:#64748b;font-size:11px}
+  .empty{text-align:center;padding:40px;color:#334155;font-size:13px}
+  .loading{text-align:center;padding:60px;color:#475569}
+  .tag-acum{background:#3b1a00;color:#fb923c;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:600}
+  .tag-mar{background:#1a2d1a;color:#86efac;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:600}
+</style>
+</head>
+<body>
+<h1>Inadimplência</h1>
+<p class="subtitle">Cruzamento entre cobranças vencidas no Asaas e status dos alunos no EVO</p>
+
+<div class="cards" id="cards">
+  <div class="card"><div class="card-label">Carregando...</div></div>
+</div>
+
+<div class="toolbar">
+  <div class="tabs">
+    <button class="tab active" onclick="setTab('ativos',this)">Inadimplentes Ativos <span id="cnt-ativos"></span></button>
+    <button class="tab" onclick="setTab('fantasmas',this)">Fantasmas (cancelados no EVO) <span id="cnt-fantasmas"></span></button>
+  </div>
+  <input class="search" id="search" type="text" placeholder="Buscar por nome ou CPF..." oninput="renderTabela()">
+  <button class="btn btn-green ml-auto" id="btn-csv" onclick="downloadCsv()">⬇ Exportar CSV</button>
+  <button class="btn btn-gray" onclick="atualizar()">↻ Atualizar</button>
+  <span class="upd" id="upd"></span>
+</div>
+
+<div id="tabela-wrap">
+  <div class="loading">Carregando dados do EVO e Asaas...</div>
+</div>
+
+<script>
+var _dados = null;
+var _aba = 'ativos';
+
+async function carregar(refresh) {
+  document.getElementById('tabela-wrap').innerHTML = '<div class="loading">Buscando dados' + (refresh ? ' (atualizando...)' : '') + '</div>';
+  try {
+    var r = await fetch('/api/inadimplencia' + (refresh ? '?refresh=1' : ''));
+    _dados = await r.json();
+    renderCards();
+    renderTabela();
+    var dt = new Date(_dados.updatedAt);
+    document.getElementById('upd').textContent = 'Atualizado às ' + dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    document.getElementById('tabela-wrap').innerHTML = '<div class="empty">Erro ao carregar: ' + e.message + '</div>';
+  }
+}
+
+function atualizar() { carregar(true); }
+
+function renderCards() {
+  var d = _dados;
+  var totalAtivos = d.ativos.reduce(function(s,x){return s+x.total},0);
+  var totalFant = d.fantasmas.reduce(function(s,x){return s+x.total},0);
+  var total = totalAtivos + totalFant;
+  var acum = d.ativos.filter(function(a){return a.meses.length>1}).length;
+
+  document.getElementById('cnt-ativos').textContent = '(' + d.ativos.length + ')';
+  document.getElementById('cnt-fantasmas').textContent = '(' + d.fantasmas.length + ')';
+
+  document.getElementById('cards').innerHTML =
+    card('warn', d.ativos.length, 'Inadimplentes ativos', 'Alunos ativos no EVO com cobrança vencida') +
+    card('danger', d.fantasmas.length, 'Fantasmas no Asaas', 'Cancelados no EVO mas ainda sendo cobrados') +
+    card('danger', 'R$ ' + fmt(total), 'Total em aberto', 'Ativos R$ ' + fmt(totalAtivos) + ' + Fantasmas R$ ' + fmt(totalFant)) +
+    card('warn', acum, 'Com dívida acumulada', 'Ativos que devem 2+ meses');
+}
+
+function card(cls, val, label, sub) {
+  return '<div class="card ' + cls + '"><div class="card-label">' + label + '</div><div class="card-value">' + val + '</div><div class="card-sub">' + sub + '</div></div>';
+}
+
+function fmt(v) { return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+
+function setTab(aba, btn) {
+  _aba = aba;
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
+  btn.classList.add('active');
+  renderTabela();
+}
+
+function renderTabela() {
+  if (!_dados) return;
+  var q = (document.getElementById('search').value || '').toLowerCase();
+  var rows = _aba === 'ativos' ? _dados.ativos : _dados.fantasmas;
+  rows = rows.filter(function(r) {
+    return !q || r.nome.toLowerCase().includes(q) || r.cpf.includes(q);
+  });
+
+  if (!rows.length) {
+    document.getElementById('tabela-wrap').innerHTML = '<div class="empty">Nenhum registro encontrado.</div>';
+    return;
+  }
+
+  var isFantasma = _aba === 'fantasmas';
+  var html = '<table><thead><tr>' +
+    '<th>#</th><th>Nome</th><th>CPF</th>' +
+    (isFantasma ? '<th>Status EVO</th>' : '') +
+    '<th>Meses devedores</th><th>Cobranças</th><th>Total</th>' +
+    '</tr></thead><tbody>';
+
+  rows.forEach(function(r, i) {
+    var acum = r.meses.length > 1;
+    var mesesStr = r.meses.map(function(m){
+      var parts = m.split('-');
+      return parts[1] + '/' + parts[0].slice(2);
+    }).join(', ');
+    var tag = acum ? '<span class="tag-acum">acumulado</span>' : '<span class="tag-mar">só este mês</span>';
+    var statusBadge = '';
+    if (isFantasma) {
+      var sc = r.evoStatus === 'Suspended' ? 'badge-suspended' : 'badge-inactive';
+      var sl = r.evoStatus === 'Suspended' ? 'Suspenso' : 'Inativo';
+      statusBadge = '<td><span class="badge ' + sc + '">' + sl + '</span></td>';
+    }
+    html += '<tr>' +
+      '<td class="cobr-count">' + (i+1) + '</td>' +
+      '<td>' + esc(r.nome) + ' ' + (!isFantasma ? tag : '') + '</td>' +
+      '<td class="meses">' + r.cpf + '</td>' +
+      statusBadge +
+      '<td class="meses">' + mesesStr + (isFantasma ? ' ' + tag : '') + '</td>' +
+      '<td class="cobr-count">' + r.cobras.length + 'x</td>' +
+      '<td class="valor">R$ ' + r.total.toFixed(2).replace('.',',') + '</td>' +
+      '</tr>';
+  });
+
+  html += '</tbody></table>';
+  document.getElementById('tabela-wrap').innerHTML = html;
+}
+
+function downloadCsv() {
+  var url = _aba === 'ativos' ? '/api/inadimplencia/csv-ativos' : '/api/inadimplencia/csv-fantasmas';
+  window.open(url);
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+carregar(false);
+</script>
+</body>
+</html>

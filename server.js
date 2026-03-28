@@ -125,6 +125,118 @@ app.delete('/api/downloads/:id', (req, res) => {
   res.json({ ok: true });
 });
 
+// ─── Inadimplência ────────────────────────────────────────────────────────────
+const https = require('https');
+const CSV_PATH = 'C:/Users/Administrator/cobranças_vencidas_por_cobrança.csv';
+
+let _inadCache = null;
+let _inadCacheTs = 0;
+
+function evoGetAll() {
+  return new Promise((resolve, reject) => {
+    const auth = Buffer.from('sahlvidanaareia:A73C9883-351A-463C-A8B4-FC2F35ED473D').toString('base64');
+    let all = [];
+    function fetchPage(skip) {
+      const opts = {
+        hostname: 'evo-integracao.w12app.com.br',
+        path: `/api/v1/members?take=100&skip=${skip}`,
+        headers: { Authorization: 'Basic ' + auth }
+      };
+      https.get(opts, r => {
+        let d = '';
+        r.on('data', c => d += c);
+        r.on('end', () => {
+          try {
+            const batch = JSON.parse(d);
+            if (!Array.isArray(batch) || !batch.length) return resolve(all);
+            all = all.concat(batch);
+            if (batch.length < 100) return resolve(all);
+            fetchPage(skip + 100);
+          } catch(e) { reject(e); }
+        });
+      }).on('error', reject);
+    }
+    fetchPage(0);
+  });
+}
+
+function buildInadimplencia(evoMembers) {
+  const evoMap = {};
+  for (const m of evoMembers) {
+    const cpf = (m.document || '').replace(/\D/g, '');
+    if (!cpf || cpf === '00000000000') continue;
+    evoMap[cpf] = { status: m.membershipStatus || m.status, nome: (m.firstName + ' ' + m.lastName).trim() };
+  }
+
+  const lines = fs.readFileSync(CSV_PATH, 'utf8').split('\n').filter(l => l.trim());
+  const rows = lines.slice(1).map(l => {
+    const c = l.split(';').map(x => x.replace(/^"|"$/g, '').trim());
+    return { nome: c[0], cpf: c[1], plano: c[2], valor: parseFloat(c[3]) || 0, venc: c[4], link: c[8] };
+  }).filter(r => r.cpf);
+
+  const byCpf = {};
+  for (const r of rows) {
+    if (!byCpf[r.cpf]) byCpf[r.cpf] = { nome: r.nome, cpf: r.cpf, cobras: [], total: 0 };
+    byCpf[r.cpf].cobras.push({ valor: r.valor, venc: r.venc, plano: r.plano, link: r.link });
+    byCpf[r.cpf].total += r.valor;
+  }
+
+  const fantasmas = [], ativos = [], naoEncontrados = [];
+  for (const cpf of Object.keys(byCpf)) {
+    const d = byCpf[cpf];
+    const evo = evoMap[cpf];
+    const meses = [...new Set(d.cobras.map(c => c.venc.slice(0, 7)))].sort();
+    const entry = { ...d, meses, evoStatus: evo ? evo.status : null };
+    if (!evo) naoEncontrados.push(entry);
+    else if (evo.status === 'Active') ativos.push(entry);
+    else fantasmas.push(entry);
+  }
+
+  fantasmas.sort((a, b) => b.total - a.total);
+  ativos.sort((a, b) => b.total - a.total);
+  return { fantasmas, ativos, naoEncontrados, updatedAt: new Date().toISOString() };
+}
+
+function toCsv(rows, tipo) {
+  const header = 'Nome;CPF;Status EVO;Meses Devedores;Qtd Cobranças;Valor Total (R$)';
+  const lines = rows.map(r =>
+    `"${r.nome}";"${r.cpf}";"${r.evoStatus || 'Não encontrado'}";"${r.meses.join(', ')}";"${r.cobras.length}";"${r.total.toFixed(2).replace('.', ',')}"`
+  );
+  return header + '\n' + lines.join('\n');
+}
+
+app.get('/api/inadimplencia', async (req, res) => {
+  const forceRefresh = req.query.refresh === '1';
+  const age = Date.now() - _inadCacheTs;
+  if (_inadCache && age < 30 * 60 * 1000 && !forceRefresh) return res.json(_inadCache);
+  try {
+    const evo = await evoGetAll();
+    _inadCache = buildInadimplencia(evo);
+    _inadCacheTs = Date.now();
+    res.json(_inadCache);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/api/inadimplencia/csv-fantasmas', (req, res) => {
+  if (!_inadCache) return res.status(503).send('Dados não carregados ainda. Acesse a página primeiro.');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="fantasmas_asaas.csv"');
+  res.send('\uFEFF' + toCsv(_inadCache.fantasmas, 'fantasmas'));
+});
+
+app.get('/api/inadimplencia/csv-ativos', (req, res) => {
+  if (!_inadCache) return res.status(503).send('Dados não carregados ainda. Acesse a página primeiro.');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="inadimplentes_ativos.csv"');
+  res.send('\uFEFF' + toCsv(_inadCache.ativos, 'ativos'));
+});
+
+app.get('/inadimplencia', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'inadimplencia.html'));
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 const server = app.listen(PORT, () => {
