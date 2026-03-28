@@ -127,40 +127,57 @@ app.delete('/api/downloads/:id', (req, res) => {
 
 // ─── Inadimplência ────────────────────────────────────────────────────────────
 const https = require('https');
-const CSV_PATH = 'C:/Users/Administrator/cobranças_vencidas_por_cobrança.csv';
+const ASAAS_KEY = '$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmZhYTBlNzMxLTY5MTktNGQ3Zi1iNmYyLWM3Y2MzYmM1ODNmNDo6JGFhY2hfNjgyNDkyOGQtZWUzYi00YmVmLWI2ZGEtN2JmZDEyNWJlMjBm';
 
 let _inadCache = null;
 let _inadCacheTs = 0;
 
-function evoGetAll() {
+function httpsGet(hostname, path, headers) {
   return new Promise((resolve, reject) => {
-    const auth = Buffer.from('sahlvidanaareia:A73C9883-351A-463C-A8B4-FC2F35ED473D').toString('base64');
+    https.get({ hostname, path, headers }, r => {
+      let d = '';
+      r.on('data', c => d += c);
+      r.on('end', () => { try { resolve(JSON.parse(d)); } catch(e) { reject(new Error('Parse error: ' + d.slice(0, 200))); } });
+    }).on('error', reject);
+  });
+}
+
+function evoGetAll() {
+  const auth = Buffer.from('sahlvidanaareia:A73C9883-351A-463C-A8B4-FC2F35ED473D').toString('base64');
+  return new Promise((resolve, reject) => {
     let all = [];
     function fetchPage(skip) {
-      const opts = {
-        hostname: 'evo-integracao.w12app.com.br',
-        path: `/api/v1/members?take=100&skip=${skip}`,
-        headers: { Authorization: 'Basic ' + auth }
-      };
-      https.get(opts, r => {
-        let d = '';
-        r.on('data', c => d += c);
-        r.on('end', () => {
-          try {
-            const batch = JSON.parse(d);
-            if (!Array.isArray(batch) || !batch.length) return resolve(all);
-            all = all.concat(batch);
-            if (batch.length < 100) return resolve(all);
-            fetchPage(skip + 100);
-          } catch(e) { reject(e); }
-        });
-      }).on('error', reject);
+      httpsGet('evo-integracao.w12app.com.br', `/api/v1/members?take=100&skip=${skip}`, { Authorization: 'Basic ' + auth })
+        .then(batch => {
+          if (!Array.isArray(batch) || !batch.length) return resolve(all);
+          all = all.concat(batch);
+          if (batch.length < 100) return resolve(all);
+          fetchPage(skip + 100);
+        }).catch(reject);
     }
     fetchPage(0);
   });
 }
 
-function buildInadimplencia(evoMembers) {
+async function asaasGetAllOverdue() {
+  const headers = { 'access_token': ASAAS_KEY };
+  let payments = [], offset = 0;
+  while (true) {
+    const r = await httpsGet('api.asaas.com', `/v3/payments?status=OVERDUE&limit=100&offset=${offset}`, headers);
+    if (!r.data || !r.data.length) break;
+    payments = payments.concat(r.data);
+    if (!r.hasMore) break;
+    offset += 100;
+  }
+  return payments;
+}
+
+async function asaasGetCustomer(id) {
+  return httpsGet('api.asaas.com', `/v3/customers/${id}`, { 'access_token': ASAAS_KEY });
+}
+
+async function buildInadimplencia(evoMembers) {
+  // Build EVO map by CPF
   const evoMap = {};
   for (const m of evoMembers) {
     const cpf = (m.document || '').replace(/\D/g, '');
@@ -168,23 +185,46 @@ function buildInadimplencia(evoMembers) {
     evoMap[cpf] = { status: m.membershipStatus || m.status, nome: (m.firstName + ' ' + m.lastName).trim() };
   }
 
-  const lines = fs.readFileSync(CSV_PATH, 'utf8').split('\n').filter(l => l.trim());
-  const rows = lines.slice(1).map(l => {
-    const c = l.split(';').map(x => x.replace(/^"|"$/g, '').trim());
-    return { nome: c[0], cpf: c[1], plano: c[2], valor: parseFloat(c[3]) || 0, venc: c[4], link: c[8] };
-  }).filter(r => r.cpf);
+  // Fetch all overdue payments from Asaas
+  const payments = await asaasGetAllOverdue();
 
+  // Group by customer ID
+  const byCustomer = {};
+  for (const p of payments) {
+    if (!byCustomer[p.customer]) byCustomer[p.customer] = [];
+    byCustomer[p.customer].push(p);
+  }
+
+  // Fetch customer details in batches of 10 (CPF needed for EVO cross-ref)
+  const customerIds = Object.keys(byCustomer);
+  const customerMap = {};
+  for (let i = 0; i < customerIds.length; i += 10) {
+    const batch = customerIds.slice(i, i + 10);
+    await Promise.all(batch.map(async id => {
+      try {
+        const c = await asaasGetCustomer(id);
+        customerMap[id] = { nome: c.name || '', cpf: (c.cpfCnpj || '').replace(/\D/g, '') };
+      } catch(e) { customerMap[id] = { nome: '', cpf: '' }; }
+    }));
+  }
+
+  // Build by CPF
   const byCpf = {};
-  for (const r of rows) {
-    if (!byCpf[r.cpf]) byCpf[r.cpf] = { nome: r.nome, cpf: r.cpf, cobras: [], total: 0 };
-    byCpf[r.cpf].cobras.push({ valor: r.valor, venc: r.venc, plano: r.plano, link: r.link });
-    byCpf[r.cpf].total += r.valor;
+  for (const [custId, pmts] of Object.entries(byCustomer)) {
+    const cust = customerMap[custId] || {};
+    const cpf = cust.cpf || '';
+    const nome = cust.nome || custId;
+    const key = cpf || custId;
+    if (!byCpf[key]) byCpf[key] = { nome, cpf, cobras: [], total: 0 };
+    for (const p of pmts) {
+      byCpf[key].cobras.push({ valor: p.value, venc: p.dueDate, plano: p.description || '', link: p.invoiceUrl || '' });
+      byCpf[key].total += p.value;
+    }
   }
 
   const fantasmas = [], ativos = [], naoEncontrados = [];
-  for (const cpf of Object.keys(byCpf)) {
-    const d = byCpf[cpf];
-    const evo = evoMap[cpf];
+  for (const [key, d] of Object.entries(byCpf)) {
+    const evo = d.cpf ? evoMap[d.cpf] : null;
     const meses = [...new Set(d.cobras.map(c => c.venc.slice(0, 7)))].sort();
     const entry = { ...d, meses, evoStatus: evo ? evo.status : null };
     if (!evo) naoEncontrados.push(entry);
@@ -194,10 +234,11 @@ function buildInadimplencia(evoMembers) {
 
   fantasmas.sort((a, b) => b.total - a.total);
   ativos.sort((a, b) => b.total - a.total);
+  naoEncontrados.sort((a, b) => b.total - a.total);
   return { fantasmas, ativos, naoEncontrados, updatedAt: new Date().toISOString() };
 }
 
-function toCsv(rows, tipo) {
+function toCsv(rows) {
   const header = 'Nome;CPF;Status EVO;Meses Devedores;Qtd Cobranças;Valor Total (R$)';
   const lines = rows.map(r =>
     `"${r.nome}";"${r.cpf}";"${r.evoStatus || 'Não encontrado'}";"${r.meses.join(', ')}";"${r.cobras.length}";"${r.total.toFixed(2).replace('.', ',')}"`
@@ -211,10 +252,11 @@ app.get('/api/inadimplencia', async (req, res) => {
   if (_inadCache && age < 30 * 60 * 1000 && !forceRefresh) return res.json(_inadCache);
   try {
     const evo = await evoGetAll();
-    _inadCache = buildInadimplencia(evo);
+    _inadCache = await buildInadimplencia(evo);
     _inadCacheTs = Date.now();
     res.json(_inadCache);
   } catch(e) {
+    console.error('[INADIMPLENCIA]', e.message);
     res.status(500).json({ error: e.message });
   }
 });
@@ -223,14 +265,14 @@ app.get('/api/inadimplencia/csv-fantasmas', (req, res) => {
   if (!_inadCache) return res.status(503).send('Dados não carregados ainda. Acesse a página primeiro.');
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="fantasmas_asaas.csv"');
-  res.send('\uFEFF' + toCsv(_inadCache.fantasmas, 'fantasmas'));
+  res.send('\uFEFF' + toCsv(_inadCache.fantasmas));
 });
 
 app.get('/api/inadimplencia/csv-ativos', (req, res) => {
   if (!_inadCache) return res.status(503).send('Dados não carregados ainda. Acesse a página primeiro.');
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename="inadimplentes_ativos.csv"');
-  res.send('\uFEFF' + toCsv(_inadCache.ativos, 'ativos'));
+  res.send('\uFEFF' + toCsv(_inadCache.ativos));
 });
 
 app.get('/inadimplencia', (req, res) => {

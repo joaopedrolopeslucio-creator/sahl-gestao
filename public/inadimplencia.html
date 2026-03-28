@@ -77,7 +77,7 @@ var _dados = null;
 var _aba = 'ativos';
 
 async function carregar(refresh) {
-  document.getElementById('tabela-wrap').innerHTML = '<div class="loading">Buscando dados' + (refresh ? ' (atualizando...)' : '') + '</div>';
+  document.getElementById('tabela-wrap').innerHTML = '<div class="loading">Buscando dados no Asaas e EVO' + (refresh ? ' (atualizando...)' : '') + ' — pode levar alguns segundos...</div>';
   try {
     var r = await fetch('/api/inadimplencia' + (refresh ? '?refresh=1' : ''));
     _dados = await r.json();
