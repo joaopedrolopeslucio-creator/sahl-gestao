@@ -188,9 +188,15 @@ async function buildInadimplencia(evoMembers) {
   // Fetch all overdue payments from Asaas
   const payments = await asaasGetAllOverdue();
 
+  // Filtrar apenas mensalidades (excluir reservas avulsas de quadra e inscrições)
+  const isMensalidade = p => {
+    const desc = (p.description || '').toLowerCase();
+    return !desc.startsWith('reserva de') && !desc.startsWith('parcela');
+  };
+
   // Group by customer ID
   const byCustomer = {};
-  for (const p of payments) {
+  for (const p of payments.filter(isMensalidade)) {
     if (!byCustomer[p.customer]) byCustomer[p.customer] = [];
     byCustomer[p.customer].push(p);
   }
