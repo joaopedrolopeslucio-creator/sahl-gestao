@@ -142,6 +142,19 @@ function httpsGet(hostname, path, headers) {
   });
 }
 
+function httpsPost(hostname, path, headers, body) {
+  return new Promise((resolve, reject) => {
+    const data = JSON.stringify(body);
+    const req = https.request(
+      { hostname, path, method: 'POST', headers: { ...headers, 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) } },
+      r => { let d = ''; r.on('data', c => d += c); r.on('end', () => { try { resolve(JSON.parse(d)); } catch(e) { reject(new Error('Parse error: ' + d.slice(0, 200))); } }); }
+    );
+    req.on('error', reject);
+    req.write(data);
+    req.end();
+  });
+}
+
 function evoGetAll() {
   const auth = Buffer.from('sahlvidanaareia:A73C9883-351A-463C-A8B4-FC2F35ED473D').toString('base64');
   return new Promise((resolve, reject) => {
@@ -283,6 +296,74 @@ app.get('/api/inadimplencia/csv-ativos', (req, res) => {
 
 app.get('/inadimplencia', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'inadimplencia.html'));
+});
+
+// ─── Cobrança Avulsa ──────────────────────────────────────────────────────────
+const SPLIT_CONFIG = {
+  'futevolei':          { professor: 'Leuzera',  walletId: '88ef954d-93db-4c7b-b6c7-b93f5c2600b1', percentual: 45 },
+  'futevolei-personal': { professor: 'Cardoso',  walletId: '272e4ca2-4ac4-48c8-ad3c-5e3e56c1b776', percentual: 45 },
+  'beach-tennis':       { professor: 'Prof. BT', walletId: '79ac0c09-cfe5-4e5c-aad9-36d48a303a2e', percentual: 40 },
+};
+
+app.get('/api/cobranca/clientes', async (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.json([]);
+  try {
+    const headers = { 'access_token': ASAAS_KEY };
+    const isDoc = /^\d{11,14}$/.test(q.replace(/\D/g, ''));
+    const param = isDoc ? `cpfCnpj=${encodeURIComponent(q.replace(/\D/g, ''))}` : `name=${encodeURIComponent(q)}`;
+    const r = await httpsGet('api.asaas.com', `/v3/customers?${param}&limit=10`, headers);
+    res.json((r.data || []).map(c => ({ id: c.id, name: c.name, cpfCnpj: c.cpfCnpj || '', email: c.email || '' })));
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/cobranca/cliente', async (req, res) => {
+  const { name, cpfCnpj, email, phone } = req.body;
+  if (!name) return res.status(400).json({ error: 'Nome obrigatório' });
+  try {
+    const body = { name };
+    if (cpfCnpj) body.cpfCnpj = cpfCnpj.replace(/\D/g, '');
+    if (email)   body.email   = email;
+    if (phone)   body.mobilePhone = phone.replace(/\D/g, '');
+    const r = await httpsPost('api.asaas.com', '/v3/customers', { 'access_token': ASAAS_KEY }, body);
+    if (r.errors) return res.status(400).json({ error: r.errors.map(e => e.description).join('; ') });
+    res.json({ id: r.id, name: r.name, cpfCnpj: r.cpfCnpj || '' });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.post('/api/cobranca/criar', async (req, res) => {
+  const { customerId, valor, vencimento, descricao, modalidade, billingType } = req.body;
+  if (!customerId || !valor || !vencimento) return res.status(400).json({ error: 'customerId, valor e vencimento são obrigatórios' });
+
+  const body = {
+    customer:    customerId,
+    billingType: billingType || 'UNDEFINED',
+    value:       parseFloat(valor),
+    dueDate:     vencimento,
+    description: descricao || 'Cobrança avulsa',
+  };
+
+  const split = SPLIT_CONFIG[modalidade];
+  if (split) {
+    body.split = [{ walletId: split.walletId, percentualValue: split.percentual }];
+  }
+
+  try {
+    const r = await httpsPost('api.asaas.com', '/v3/payments', { 'access_token': ASAAS_KEY }, body);
+    if (r.errors) return res.status(400).json({ error: r.errors.map(e => e.description).join('; ') });
+    res.json({ id: r.id, invoiceUrl: r.invoiceUrl || '', bankSlipUrl: r.bankSlipUrl || '', status: r.status, split: split || null });
+  } catch(e) { res.status(500).json({ error: e.message }); }
+});
+
+app.get('/cobranca-avulsa', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'cobranca-avulsa.html'));
+});
+
+app.get('/download/antecipacao-leuzera', (req, res) => {
+  const file = path.join(__dirname, 'public', 'relatorio-antecipacao-leuzera.csv');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+  res.setHeader('Content-Disposition', 'attachment; filename="antecipacao-leuzera-2026-04-02.csv"');
+  res.sendFile(file);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));

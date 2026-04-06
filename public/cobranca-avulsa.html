@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cobrança Avulsa — SAHL</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#090b12;min-height:100vh;font-family:'Segoe UI',system-ui,sans-serif;color:#e2e8f0;padding:32px 24px}
+
+  .page-title{font-size:20px;font-weight:700;color:#e2e8f0;margin-bottom:4px}
+  .page-sub{font-size:13px;color:#3d4466;margin-bottom:28px}
+
+  .card{background:#0c0e1a;border:1px solid #1a1f35;border-radius:14px;padding:24px;max-width:600px;display:flex;flex-direction:column;gap:20px}
+
+  .field{display:flex;flex-direction:column;gap:6px}
+  .label{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em}
+  .input{background:#090b12;border:1px solid #1a1f35;color:#e2e8f0;border-radius:8px;padding:10px 13px;font-size:14px;outline:none;font-family:inherit;transition:border-color .15s;width:100%}
+  .input:focus{border-color:#6366f1}
+  .input::placeholder{color:#2a3050}
+  select.input{cursor:pointer}
+  select.input option{background:#0c0e1a}
+
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+  /* busca de cliente */
+  .search-wrap{position:relative}
+  .search-results{position:absolute;top:100%;left:0;right:0;background:#0f1220;border:1px solid #1a1f35;border-radius:8px;margin-top:4px;z-index:50;display:none;max-height:220px;overflow-y:auto}
+  .search-results.open{display:block}
+  .search-item{padding:10px 13px;cursor:pointer;font-size:13px;border-bottom:1px solid #141829;transition:background .12s}
+  .search-item:last-child{border-bottom:none}
+  .search-item:hover{background:#161c33}
+  .search-item-name{color:#e2e8f0;font-weight:600}
+  .search-item-doc{color:#3d4466;font-size:11px;margin-top:2px}
+  .search-item-new{color:#818cf8;font-weight:600}
+  .selected-customer{display:none;align-items:center;gap:10px;background:#0f1525;border:1px solid #1e3a5f;border-radius:8px;padding:10px 13px}
+  .selected-customer.visible{display:flex}
+  .selected-name{font-size:14px;font-weight:600;color:#e2e8f0;flex:1}
+  .selected-doc{font-size:11px;color:#3d4466}
+  .btn-change{background:none;border:none;color:#3d4466;cursor:pointer;font-size:12px;padding:2px 8px;border-radius:5px;transition:color .15s}
+  .btn-change:hover{color:#818cf8}
+
+  /* novo cliente inline */
+  .novo-cliente{background:#0c1020;border:1px solid #1a2a3f;border-radius:10px;padding:16px;display:none;flex-direction:column;gap:12px}
+  .novo-cliente.open{display:flex}
+  .novo-title{font-size:12px;font-weight:700;color:#818cf8;text-transform:uppercase;letter-spacing:.07em}
+
+  /* split preview */
+  .split-preview{background:#0a1a10;border:1px solid #1a3025;border-radius:10px;padding:14px 16px;display:none;flex-direction:column;gap:6px}
+  .split-preview.visible{display:flex}
+  .split-row{display:flex;justify-content:space-between;align-items:center;font-size:13px}
+  .split-label{color:#64748b}
+  .split-value{color:#22c55e;font-weight:700}
+  .split-sahl{color:#6366f1;font-weight:700}
+  .split-divider{border:none;border-top:1px solid #1a3025;margin:4px 0}
+
+  /* actions */
+  .actions{display:flex;gap:10px;align-items:center}
+  .btn-criar{background:#6366f1;border:none;color:#fff;border-radius:9px;padding:11px 28px;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s;min-width:160px}
+  .btn-criar:hover{opacity:.85}
+  .btn-criar:disabled{opacity:.4;cursor:not-allowed}
+  .loading{display:none;font-size:13px;color:#3d4466}
+
+  /* resultado */
+  .resultado{display:none;background:#0c0e1a;border:1px solid #1a1f35;border-radius:14px;padding:24px;max-width:600px;flex-direction:column;gap:16px;margin-top:20px}
+  .resultado.visible{display:flex}
+  .res-titulo{font-size:16px;font-weight:700;color:#22c55e}
+  .res-info{font-size:13px;color:#64748b;display:flex;flex-direction:column;gap:6px}
+  .res-info span b{color:#e2e8f0}
+  .res-actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn-link{display:inline-flex;align-items:center;gap:7px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#818cf8;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;transition:all .2s}
+  .btn-link:hover{background:rgba(99,102,241,.22);border-color:#6366f1}
+  .btn-nova{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.2);color:#22c55e;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+  .btn-nova:hover{background:rgba(34,197,94,.18)}
+
+  .err{background:#1a0808;border:1px solid #3f1515;border-radius:8px;padding:12px 14px;font-size:13px;color:#ef4444;display:none}
+  .err.visible{display:block}
+</style>
+</head>
+<body>
+
+<div class="page-title">Cobrança Avulsa</div>
+<div class="page-sub">Crie cobranças pontuais com split automático por modalidade.</div>
+
+<div class="card">
+
+  <!-- Cliente -->
+  <div class="field">
+    <label class="label">Cliente</label>
+    <div class="search-wrap" id="search-wrap">
+      <input class="input" id="cliente-busca" placeholder="Buscar por nome ou CPF/CNPJ..." autocomplete="off">
+      <div class="search-results" id="search-results"></div>
+    </div>
+    <div class="selected-customer" id="selected-customer">
+      <div style="flex:1">
+        <div class="selected-name" id="sel-nome"></div>
+        <div class="selected-doc" id="sel-doc"></div>
+      </div>
+      <button class="btn-change" onclick="limparCliente()">Trocar</button>
+    </div>
+  </div>
+
+  <!-- Novo cliente inline -->
+  <div class="novo-cliente" id="novo-cliente">
+    <div class="novo-title">Novo cliente</div>
+    <div class="field">
+      <label class="label">Nome completo *</label>
+      <input class="input" id="novo-nome" placeholder="Nome do aluno">
+    </div>
+    <div class="row">
+      <div class="field">
+        <label class="label">CPF / CNPJ</label>
+        <input class="input" id="novo-doc" placeholder="000.000.000-00">
+      </div>
+      <div class="field">
+        <label class="label">Celular</label>
+        <input class="input" id="novo-fone" placeholder="(11) 99999-9999">
+      </div>
+    </div>
+    <div class="field">
+      <label class="label">E-mail</label>
+      <input class="input" id="novo-email" placeholder="email@exemplo.com" type="email">
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="btn-criar" style="background:#22c55e;min-width:auto;padding:9px 20px;font-size:13px" onclick="criarCliente()">Cadastrar cliente</button>
+      <button class="btn-criar" style="background:none;border:1px solid #1a1f35;color:#475569;min-width:auto;padding:9px 20px;font-size:13px" onclick="cancelarNovo()">Cancelar</button>
+    </div>
+  </div>
+
+  <!-- Valor e vencimento -->
+  <div class="row">
+    <div class="field">
+      <label class="label">Valor (R$)</label>
+      <input class="input" id="valor" type="number" min="1" step="0.01" placeholder="0,00" oninput="atualizarPreview()">
+    </div>
+    <div class="field">
+      <label class="label">Vencimento</label>
+      <input class="input" id="vencimento" type="date">
+    </div>
+  </div>
+
+  <!-- Modalidade -->
+  <div class="field">
+    <label class="label">Modalidade / Split</label>
+    <select class="input" id="modalidade" onchange="atualizarPreview()">
+      <option value="">Sem split (100% SAHL)</option>
+      <option value="futevolei">Futevôlei — Leuzera (45%)</option>
+      <option value="futevolei-personal">Futevôlei Personal — Cardoso (45%)</option>
+      <option value="beach-tennis">Beach Tennis — Prof. BT (40%)</option>
+    </select>
+  </div>
+
+  <!-- Forma de pagamento -->
+  <div class="field">
+    <label class="label">Forma de Pagamento</label>
+    <select class="input" id="billing-type">
+      <option value="UNDEFINED">Link — cliente escolhe (PIX ou Boleto)</option>
+      <option value="PIX">PIX</option>
+      <option value="BOLETO">Boleto Bancário</option>
+    </select>
+  </div>
+
+  <!-- Descrição -->
+  <div class="field">
+    <label class="label">Descrição</label>
+    <input class="input" id="descricao" placeholder="Ex: Aula particular Futevôlei — Abril/2026">
+  </div>
+
+  <!-- Split preview -->
+  <div class="split-preview" id="split-preview">
+    <div class="split-row">
+      <span class="split-label" id="prev-prof-label">Professor</span>
+      <span class="split-value" id="prev-prof-val">—</span>
+    </div>
+    <hr class="split-divider">
+    <div class="split-row">
+      <span class="split-label">SAHL</span>
+      <span class="split-sahl" id="prev-sahl-val">—</span>
+    </div>
+  </div>
+
+  <!-- Erro -->
+  <div class="err" id="err-msg"></div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <button class="btn-criar" id="btn-criar" onclick="criar()">Criar Cobrança</button>
+    <span class="loading" id="loading">Criando...</span>
+  </div>
+
+</div>
+
+<!-- Resultado -->
+<div class="resultado" id="resultado">
+  <div class="res-titulo">✅ Cobrança criada com sucesso!</div>
+  <div class="res-info" id="res-info"></div>
+  <div class="res-actions">
+    <a class="btn-link" id="res-link" href="#" target="_blank">🔗 Abrir link de pagamento</a>
+    <button class="btn-nova" onclick="novaCob()">+ Nova Cobrança</button>
+  </div>
+</div>
+
+<script>
+const SPLIT = {
+  'futevolei':          { professor: 'Leuzera',  percentual: 45 },
+  'futevolei-personal': { professor: 'Cardoso',  percentual: 45 },
+  'beach-tennis':       { professor: 'Prof. BT', percentual: 40 },
+};
+
+let clienteSelecionado = null;
+let searchTimeout = null;
+
+// ── Vencimento padrão: hoje ───────────────────────────────────────────────────
+const hoje = new Date();
+const pad = n => String(n).padStart(2,'0');
+document.getElementById('vencimento').value = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
+
+// ── Busca de cliente ──────────────────────────────────────────────────────────
+document.getElementById('cliente-busca').addEventListener('input', function() {
+  clearTimeout(searchTimeout);
+  const q = this.value.trim();
+  if (q.length < 2) { fecharResultados(); return; }
+  searchTimeout = setTimeout(() => buscarClientes(q), 400);
+});
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('search-wrap').contains(e.target)) fecharResultados();
+});
+
+async function buscarClientes(q) {
+  try {
+    const r = await fetch('/api/cobranca/clientes?q=' + encodeURIComponent(q)).then(r => r.json());
+    const el = document.getElementById('search-results');
+    if (!r.length) {
+      el.innerHTML = `<div class="search-item" onclick="abrirNovo()"><div class="search-item-new">+ Cadastrar "${q}" como novo cliente</div></div>`;
+    } else {
+      el.innerHTML = r.map(c => `
+        <div class="search-item" onclick="selecionarCliente('${c.id}','${esc(c.name)}','${esc(c.cpfCnpj)}')">
+          <div class="search-item-name">${c.name}</div>
+          <div class="search-item-doc">${c.cpfCnpj || 'Sem CPF/CNPJ'}</div>
+        </div>`).join('') +
+        `<div class="search-item" onclick="abrirNovo()"><div class="search-item-new">+ Cadastrar novo cliente</div></div>`;
+    }
+    el.classList.add('open');
+  } catch(e) { console.error(e); }
+}
+
+function fecharResultados() {
+  document.getElementById('search-results').classList.remove('open');
+}
+
+function selecionarCliente(id, nome, doc) {
+  clienteSelecionado = { id, name: nome, cpfCnpj: doc };
+  document.getElementById('sel-nome').textContent = nome;
+  document.getElementById('sel-doc').textContent  = doc || 'Sem CPF/CNPJ';
+  document.getElementById('selected-customer').classList.add('visible');
+  document.getElementById('search-wrap').style.display = 'none';
+  document.getElementById('novo-cliente').classList.remove('open');
+  fecharResultados();
+}
+
+function limparCliente() {
+  clienteSelecionado = null;
+  document.getElementById('selected-customer').classList.remove('visible');
+  document.getElementById('search-wrap').style.display = '';
+  document.getElementById('cliente-busca').value = '';
+  document.getElementById('cliente-busca').focus();
+}
+
+// ── Novo cliente ──────────────────────────────────────────────────────────────
+function abrirNovo() {
+  const q = document.getElementById('cliente-busca').value.trim();
+  document.getElementById('novo-nome').value = q;
+  document.getElementById('novo-cliente').classList.add('open');
+  fecharResultados();
+  document.getElementById('novo-nome').focus();
+}
+
+function cancelarNovo() {
+  document.getElementById('novo-cliente').classList.remove('open');
+}
+
+async function criarCliente() {
+  const nome  = document.getElementById('novo-nome').value.trim();
+  const doc   = document.getElementById('novo-doc').value.trim();
+  const fone  = document.getElementById('novo-fone').value.trim();
+  const email = document.getElementById('novo-email').value.trim();
+  if (!nome) { alert('Nome é obrigatório'); return; }
+  try {
+    const r = await fetch('/api/cobranca/cliente', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: nome, cpfCnpj: doc, phone: fone, email })
+    }).then(r => r.json());
+    if (r.error) { alert('Erro: ' + r.error); return; }
+    selecionarCliente(r.id, r.name, r.cpfCnpj);
+    document.getElementById('novo-cliente').classList.remove('open');
+  } catch(e) { alert('Erro ao cadastrar cliente.'); }
+}
+
+// ── Preview de split ──────────────────────────────────────────────────────────
+function atualizarPreview() {
+  const modalidade = document.getElementById('modalidade').value;
+  const valor = parseFloat(document.getElementById('valor').value) || 0;
+  const prev  = document.getElementById('split-preview');
+  if (!modalidade || !SPLIT[modalidade]) { prev.classList.remove('visible'); return; }
+  const s = SPLIT[modalidade];
+  const profVal = valor * s.percentual / 100;
+  const sahlVal = valor - profVal;
+  document.getElementById('prev-prof-label').textContent = s.professor + ' (' + s.percentual + '%)';
+  document.getElementById('prev-prof-val').textContent = valor ? 'R$ ' + profVal.toFixed(2).replace('.',',') : '—';
+  document.getElementById('prev-sahl-val').textContent  = valor ? 'R$ ' + sahlVal.toFixed(2).replace('.',',') : '—';
+  prev.classList.add('visible');
+}
+
+// ── Criar cobrança ────────────────────────────────────────────────────────────
+async function criar() {
+  const err = document.getElementById('err-msg');
+  err.classList.remove('visible');
+
+  if (!clienteSelecionado) { mostrarErro('Selecione ou cadastre um cliente.'); return; }
+  const valor      = document.getElementById('valor').value;
+  const vencimento = document.getElementById('vencimento').value;
+  if (!valor || parseFloat(valor) <= 0) { mostrarErro('Informe um valor válido.'); return; }
+  if (!vencimento) { mostrarErro('Informe o vencimento.'); return; }
+
+  const btn = document.getElementById('btn-criar');
+  btn.disabled = true;
+  document.getElementById('loading').style.display = 'inline';
+
+  try {
+    const body = {
+      customerId:  clienteSelecionado.id,
+      valor,
+      vencimento,
+      descricao:   document.getElementById('descricao').value.trim() || 'Cobrança avulsa',
+      modalidade:  document.getElementById('modalidade').value,
+      billingType: document.getElementById('billing-type').value,
+    };
+    const r = await fetch('/api/cobranca/criar', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
+    }).then(r => r.json());
+
+    if (r.error) { mostrarErro(r.error); return; }
+
+    // Mostrar resultado
+    const s = r.split;
+    const v = parseFloat(valor);
+    let infoHtml = `<span><b>Cliente:</b> ${clienteSelecionado.name}</span>`;
+    infoHtml += `<span><b>Valor:</b> R$ ${v.toFixed(2).replace('.',',')}</span>`;
+    infoHtml += `<span><b>Vencimento:</b> ${vencimento.split('-').reverse().join('/')}</span>`;
+    if (s) {
+      const profVal = (v * s.percentual / 100).toFixed(2).replace('.',',');
+      const sahlVal = (v - v * s.percentual / 100).toFixed(2).replace('.',',');
+      infoHtml += `<span><b>Split:</b> ${s.professor} R$ ${profVal} · SAHL R$ ${sahlVal}</span>`;
+    }
+    infoHtml += `<span><b>Status:</b> ${r.status}</span>`;
+    document.getElementById('res-info').innerHTML = infoHtml;
+    document.getElementById('res-link').href = r.invoiceUrl || r.bankSlipUrl || '#';
+    if (!r.invoiceUrl && !r.bankSlipUrl) document.getElementById('res-link').style.display = 'none';
+    document.getElementById('resultado').classList.add('visible');
+    document.getElementById('resultado').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  } catch(e) { mostrarErro('Erro inesperado: ' + e.message); }
+  finally {
+    btn.disabled = false;
+    document.getElementById('loading').style.display = 'none';
+  }
+}
+
+function mostrarErro(msg) {
+  const el = document.getElementById('err-msg');
+  el.textContent = msg;
+  el.classList.add('visible');
+  document.getElementById('btn-criar').disabled = false;
+  document.getElementById('loading').style.display = 'none';
+}
+
+function novaCob() {
+  limparCliente();
+  document.getElementById('valor').value = '';
+  document.getElementById('descricao').value = '';
+  document.getElementById('modalidade').value = '';
+  document.getElementById('billing-type').value = 'UNDEFINED';
+  document.getElementById('split-preview').classList.remove('visible');
+  document.getElementById('resultado').classList.remove('visible');
+  document.getElementById('err-msg').classList.remove('visible');
+  document.getElementById('res-link').style.display = '';
+  // reset vencimento para hoje
+  document.getElementById('vencimento').value = `${hoje.getFullYear()}-${pad(hoje.getMonth()+1)}-${pad(hoje.getDate())}`;
+  document.getElementById('cliente-busca').focus();
+}
+
+function esc(s) { return (s||'').replace(/'/g, "\\'"); }
+</script>
+
+</body>
+</html>

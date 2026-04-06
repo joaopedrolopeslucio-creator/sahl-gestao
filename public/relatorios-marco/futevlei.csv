@@ -1,0 +1,336 @@
+﻿Tipo;Aluno;Plano / Descrição;Valor (R$);Status;Prof. Recebe (R$)
+Contrato;RODRIGO TOLEDO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANA NERY GUIMARÃES DE CARVALHO;1x/semana | FLEX;;Vencido;
+Contrato;JOÃO MARCOS BRANDÃO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;RAFAEL BEBIANO TEIXEIRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;FREDERICO CARAM LUIZ;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO JOSÉ SANTANA GUEDES FILHO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;IAN ANDRADE DE MACEDO BONZI;2x/semana;;Vencido;
+Contrato;RAPHAEL DE ÁVILA LEITE;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ADMAR DE OLIVEIRA LAGE;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;HENRIQUE SHIKIDA SALOMÃO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;RENAN SCHILLING;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;ADRIANO AMILITOS;1x/semana;;Vencido;
+Contrato;FRANCES SALES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LUCAS SAMPAIO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO HENRIQUE COSTA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;MARINA PENIDO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;GABRIELA COUTO ELIAS;Mensalidade - FTV 1x na semana mensal (RENOVAÇÃO AUTOMÁTICA);94,50;Pago em dinheiro;41,03
+Contrato;IZABELA FERNANDES BICALHO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;FELIPE BARRETO ALVES;Mensalidade - FTV 1x na semana mensal (RENOVAÇÃO AUTOMÁTICA);219,00;Confirmado (cartão);95,38
+Contrato;NINA CLARA DO ESPIRITO SANTO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GUILHERME FLORES FONSECA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ARTHUR MONTEIRO DE CASTRO ESPÍRITO SANTO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MICHELE ARRUDA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LUANA DE OLIVEIRA CAMPOS E SILVA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;FREDERICO CAMPOS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LAVÍNIA RODRIGUES BRAGA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;EDUARDO CORRÊA ALVES PIMENTA LIMA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;IGOR PONTES;3x/semana;329,00;Confirmado (cartão);143,40
+Contrato;MANUELA SIQUEIRA;1x/semana;;Vencido;
+Contrato;VICENTE JAEGER;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LUIZA BEATRIZ MELLO NAURATH;2x/semana | FLEX;229,00;Pago em dinheiro;99,75
+Contrato;LAURA CRISTINA MELLO NAURATH;2x/semana | FLEX;229,00;Pago em dinheiro;99,75
+Contrato;GABRIEL LAGES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ISABELA SANSONI VASCONCELOS;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;SOFIA LOMBARDI ELMAIS;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;MARIA EDUARDA MACHADO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ISABELLA ALMEIDA FONSECA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;TIAGO MARTINS MARQUES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LAURA FURTADO;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;SANSHA COSTA;Mensalidade - FTV 3x na semana mensal  (RENOVAÇÃO AUTOMÁTICA);359,00;Confirmado (cartão);156,50
+Contrato;PEDRO NORONHA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;JOAO VICTOR DE FREITAS FRANCO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;EDUARDO VICTOR FRANCO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;PEDRO FAJARDO;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;FELIPPE FERREIRA DE MELLO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ANA PAULA PEREIRA MENDONÇA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;JOAO VITOR BEDRAN;1x/semana;;Vencido;
+Contrato;HEITOR DUMONT OLIVEIRA E SILVA;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;BRUNO DE OLIVEIRA VAZ LANZA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;SOFIA DE CASTRO BORGES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;JOAO PEDRO DORNAS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;FERNANDA DUARTE ESPIR;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANA LUIZA GONZÁLEZ SOUZA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARIANA LOURENÇO MOREIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ALICE LOURENÇO MOREIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LUIZA DIAS ALKMIM;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;RODRIGO BLECK;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;JOÃO PEDRO  BARBABELLA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANDRÉ  MOURÃO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;PEDRO VENERANDO LOPES DE SOUZA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;PIETRO PELUSO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANNA LUIZA AGUIAR REIS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LUCAS GAIA MOSSRI DE ALMEIDA;1x/semana;189,00;Pago;81,39
+Contrato;MARIANA CODEVILLA SANTANA DE MOURA;1x/semana;189,00;Pago;81,39
+Contrato;IZABELLA LOPES;2x/semana;269,00;Pago;115,94
+Contrato;VICTOR SÁVIO SANTOS;3x/semana;329,00;Pago;141,85
+Contrato;NICOLE GAZZIENELLI BRANCO DE SÁ;2x/semana;269,00;Pago;115,94
+Contrato;LUIZA LEMOS OLIVEIRA BARROS;2x/semana;269,00;Pago;115,94
+Contrato;MARIA LUIZA LANZA;2x/semana;269,00;Pago;115,94
+Contrato;Eduardo Reuter do Nascimento;Mensalidade - NOVO TESTE SPLIT;;Estornado;
+Contrato;Eduardo Reuter do Nascimento;Mensalidade - TESTE SPLIT DIÁRRIO;;Estornado;
+Contrato;JOÃO VITOR CURTY ZAMORA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;RAFAEL MARRA E PIMENTA;3x/semana;329,00;Pago em dinheiro;143,40
+Contrato;ANA HELENA NASCIMENTO SALMAN;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;BERNARDO PIRES DE ASSIS NUNES;2x/semana;;Vencido;
+Contrato;FERNANDA CHAER LOPES SOARES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;PEDRO CHARTUNI;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;HENRIQUE GODINHO MENEZES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ISABELA FERNANDES BARROSO;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;PEDRO QUINTÃO SENNA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ISABELLA DE MELO REIS TAVARES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;VITOR DE REZENDE PIRES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO VICTOR QUEIROGA DE PINHO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;PEDRO HENRIQUE SILVA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARINA VINHAS MOYSÉS;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARCELA MOREIRA PENNA DE ALMEIDA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARCELA FONSECA DE PAULA MACHADO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LAURA TORRES GUERRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LAURA LIMA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LARISSA CAMPOS VIEIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GUILHERME AYRES RIBEIRO MOREIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GIOVANA RODRIGUES BORGES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;GERMANO LEAL LAIA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;FELIPE TEIXEIRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;EVANDRO NASCIMENTO RADAELLI;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;BRUNA FONSECA DE PAULA MACHADO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;Pedro Victorio Cota Postali;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GUSTAVO LIRA MEYER;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;FELIPE FERRAZ;1x/semana | PERSONAL;379,00;Confirmado (cartão);165,23
+Contrato;THAÍS RODRIGUES FERREIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MATHEUS GOUVEA DE SOUZA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;BERNARDO CAMPOS;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ANANDA ANDRADE;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO HENRIQUE RIBEIRO D’AMATO FEEREIRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;SOPHIA KFURI BATISTA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PAMELA EVANGELISTA GONÇALVES JUNQUEIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MANUELA MENEZES;1x/semana;;Vencido;
+Contrato;LUISA DO COUTO E SILVA PRIMORAC;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LEYRE EMILLY;1x/semana;;Vencido;
+Contrato;JÚLIA DE OLIVEIRA BARBOSA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;JOANNA DE OLIVEIRA CASTRO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;HENRIQUE SHIKIDA SALOMÃO;3x/semana;;Estornado;
+Contrato;HEITOR PASSOS DOMINGUES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GUSTAVO MIRANDA ISONI;1x/semana;;Vencido;
+Contrato;GABRIELLY DE MESQUITA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;FILIPE OTAVIO BRAGA ARAUJO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;AULISIA MARIA;1x/semana;189,00;Pago em dinheiro;82,28
+Contrato;VITÓRIA FONSECA MOREIRA ANDRADE;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;NATALIA WENDT;2x/semana | FLEX;229,00;Confirmado (cartão);99,75
+Contrato;MARIA CLARA  VIEIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LUCAS GUIMARÃES LIMA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ISABELLE ALMEIDA VELOSO;2x/semana;269,00;Pago em dinheiro;117,21
+Contrato;ISABELA OLIVEIRA MARTINS DA COSTA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GUILHERME FLORES FONSECA;2x/semana;;Estornado;
+Contrato;GABRIEL VIDAL MACEDO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;CRISTIANO RAMOS MALVINI;1x/semana;189,00;Pago em dinheiro;82,28
+Contrato;PEDRO  COUTINHO;1x/semana;189,00;Pago em dinheiro;82,28
+Contrato;LUIZA COSTA DE ALMEIDA MAGALHÃES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LETÍCIA FREITAS DE PAULA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;JULIA MARIA MAGALHAES MOURAO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ZARAH NACIF D MOREIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARCO CHIAPPAVENTO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;VICTOR CORRADI;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;RAFAEL FONSECA AMARAL;1x/semana;;Vencido;
+Contrato;CLARICE OLIVEIRA MARTINS DA COSTA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANA PAULA FONSECA SITYA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;PEDRO HENRIQUE OLIVEIRA AZEVEDO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;MATHEUS ALVES BERAO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;RAPHAEL BUARQUE MACHADO;3x/semana;329,00;Confirmado (cartão);143,40
+Contrato;BEATRIZ ALVARENGA BARBOSA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARCOS FELIPE LANZONI MOURA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PAULA MARTINS DA COSTA SILVÉRIO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;EDGARD GUIMARÃES DUCA;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;FELIPE AGUILAR SANTOS MOURA;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;MARIA FERNANDA CARVALHAR CABRAL;1x/semana;;Vencido;
+Contrato;EDUARDO BRAGA DA SILVA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;CATHARINA BELO DUARTE;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;FERNANDA SALOMÃO DE CASTRO PEREIRA;1x/semana;;Vencido;
+Contrato;ÍCARO  RODRIGUES CARLOS CÂNDIDO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;JÚLIA RIBEIRO LEÃO LARA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;BÁRBARA  RODRIGUES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;JOAO VITOR VARGAS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;CELESTE BUENO MAZONI;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LETICIA FRANÇA REIS VIVAS;3x/semana;329,00;Confirmado (cartão);143,40
+Contrato;CAUÃ DE ALMEIDA PIRES GUIMARÃES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;SERGIO LEAL DE FIGUEIREDO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;BÁRBARA BRITO MESSIAS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;GABRIELA MARINHO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;AULUS PESSOA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;CAROLINA  DIAS;2x/semana;;Vencido;
+Contrato;ANA CAROLINA AGUIAR DE MATOSINHOS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;GABRIELA CHAER LOPES SOARES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;BRUNA BELO DUARTE;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;DAVID MARTINS DA SILVA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;RACHEL SCALIONI BORGES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;DIEGO PONTES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO AMORIN GALDINO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ALANA FROEDE LORENTZ RODRIGUES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;HEITOR MOLICA SOARES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARIANE NASCIMENTO FIGUEIREDO AMARAL;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;PEDRO IVO GONÇALVES RIBEIRO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANA CLARA DE REZENDE BOZA CARAM RUAS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;MARINA PIVATELLI SOARES FONTES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;BÁRBARA NIQUINI ASSUNÇÃO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LUAN VALGAS DE PAULA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LORRANE VALGAS;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;FERNANDA MIRANDA COELHO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;HELENA MARIA SOUSA LIMA DE MAGALHAES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARCELO LIMA FRAGA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LEONARDO FONSECA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ESTHER BREMER BARROSO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LETÍCIA BRAGA SOTERO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARIANA FREITAS PORTO DE OLIVEIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;HENRIQUE DE PAULA DA ROCHA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;HENRIQUE AMORIM SOARES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARCELA HORTA CANÇADO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO HENRIQUE ZEBRAL;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;MAYRA  VIANA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;CÁSSIO  RODRIGUES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;BÁRBARA  DA ROCHA REIS;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LUCAS VARANDAS FERREIRA MELO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ENZO VERDOLIN PAULINO MACEDO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;FERNANDO CORREIA LIMA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;FREDERICO NADAL PIMENTA MANSO PÉREZ;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;SAVIO ALMEIDA BOTREL;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARIAH SOUTO MARQUES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;RAFAELA CORREA VIDOTTI COBERIO GUERRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ENZO FABRIZIO NUNEZ AGURTO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO HENRIQUE MACHADO XAVIER;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LAURA MARCOLINO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;WAGNER LEITE FERREIRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ISABELA FONTANELLE;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;EDUARDO GONZAGA DE PAULA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANA CLARA MESQUITA FREIRE;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;CECILIA COELHO REIS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;RYAN VILARINO DE OLIVEIRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO RIBEIRO LACORTE FERREIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LAURA FALCONI;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARIANA REZENDE ROSENBURG;1x/semana;;Vencido;
+Contrato;JÚLIA RODRIGUES DE SENNA MENDONÇA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;JOÃO  SOARES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GABRIELA VIEIRA PRATES;2x/semana;;Estornado;
+Contrato;LUCAS ANTONACI;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GABRIELA MAGALHAES DE SOUSA E SILVA;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;PEDRO NORONHA;1x/semana;;Estornado;
+Contrato;RAFAEL HERMETO DA ROCHA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LEONARDO FERMAN;3x/semana;329,00;Confirmado (cartão);143,40
+Contrato;LUIS FELIPE DAYRELL DE MATOS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;THALES TICLE FERREIRA BERTHO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;RENATA CURI ZOFFOLI;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LÍVIA TORQUATO OLIVEIRA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;JULIA VELOSO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;GABRIEL BAHIA LEITE;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;FELIPE SANTOS;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ARTUR MOREIRA RODRIGUES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;SARAH GIBOSKY MIGLIORANÇA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;EDUARDO SANTOS PENELLO CARDOSO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARIA EDUARDA ROMANO;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;JAPJI KAUR NOGUEIRA REZENDE;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;PEDRO MAGALHÃES ASSIS CHAMI;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ANA CLARA CABRAL MARQUES FREIRE;2x/semana | FLEX;;Estornado;
+Contrato;LUCCA GUERRA;1x/semana | FLEX;149,00;Confirmado (cartão);64,82
+Contrato;TIAGO MARTINS MARQUES;4x/semana;;Estornado;
+Contrato;ANA CAROLINA MONKEN;3x/semana;329,00;Confirmado (cartão);143,40
+Contrato;ANDRÉ HENRIQUE OTONI LOPES;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;TAINÁ LIMA SÃO JOSÉ;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;LUIZ AUGUSTO NERY;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;VICTOR HUGO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ISA GONTIJO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;GUILHERME MATTOS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ANA LAURA DE FREITAS MATTOS;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ALEXANDRE SALOMAO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PAULO HENRIQUE COTA STARLING;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LETICIA VELOSO PENA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;BRUNA KARAN;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ÁLVARO MENEZES ALVES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;JULIA ALMEIDA DE MENEZES;1x/semana;;Vencido;
+Contrato;HENRIQUE ARAÚJO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;MARIANA LOURENÇO GOMES SILVA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;EDUARDA DE PAULA E SILVA DAMASCENO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;BEATRIZ AYUMI MOREIRA MASSUNAGA;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;DANIEL CESCHIATTI AGRELLO;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;ARIANE ALVES DOS SANTOS;2x/semana;269,00;Confirmado (cartão);115,89
+Contrato;JOÃO PEDRO LODI FRANÇA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MARINA CAJU;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;SILVIA FAGUNDES PEREIRA PLACIDES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;LUCAS LIMA TELES BAETA ZEBRAL;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;VINICIUS MORAIS CRUZ;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;CAIO ALMEIDA FRICHE PASSOS;1x/semana;189,00;Pago;81,39
+Contrato;CARLOS LAGE;2x/semana;269,00;Pago;115,94
+Contrato;PEDRO PEREIRA;3x/semana;329,00;Pago;141,85
+Contrato;MARIA LUIZA VENICIO VILANOVA MONKEN;2x/semana;269,00;Pago;115,94
+Contrato;LEONARDO VASCONCELLOS;2x/semana;269,00;Pago;115,94
+Contrato;HEBERT VINÍCIUS PIMENTEL;2x/semana;269,00;Pago;115,94
+Contrato;GABRIEL FERRI;2x/semana;269,00;Pago;115,94
+Contrato;AUGUSTO PEREIRA CARNEIRO;2x/semana;269,00;Pago;115,94
+Contrato;RAUL LUAR SILVA ARAÚJO;1x/semana;189,00;Pago;81,39
+Contrato;ISABELA ALVES DA SILVA;1x/semana;189,00;Pago;81,39
+Contrato;JAYANE MONTARIA;1x/semana;;Vencido;
+Contrato;FELIPE RENAULT;1x/semana | FLEX;149,00;Pago em dinheiro;64,82
+Contrato;RAFAELA VIEIRA;3x/semana;329,00;Pago;141,85
+Contrato;TÚLIO  FONSECA COIMBRA;2x/semana;269,00;Pago;115,94
+Contrato;RAFAEL ATMA MENDES;2x/semana;269,00;Pago;115,94
+Contrato;MARIA APARECIDA MIRANDA CASTRO;2x/semana;269,00;Pago;115,94
+Contrato;LEONARDO MONTEIRO CAMELO;2x/semana;;Estornado;
+Contrato;JOÃO PEDRO VIANA DE BRITO;2x/semana;269,00;Pago;115,94
+Contrato;FELIPE FERRAZ;2x/semana;269,00;Pago;115,94
+Contrato;ANDRE CASTILHO;1x/semana;189,00;Pago;81,39
+Contrato;ANA KARLA GOMES MEDEIROS;1x/semana;189,00;Pago;81,39
+Contrato;GABRIELA DIAS GATTONI;1x/semana;189,00;Pago;81,39
+Contrato;MANUELA CARDOSO ANTUNES;1x/semana;189,00;Pago;81,39
+Contrato;ISABELLA RODRIGUES XAVIER;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;ARTHUR AREAL;1x/semana | FLEX;125,00;Pago;53,76
+Contrato;GABRIELA TÔRRES HENRIQUES;1x/semana;189,00;Pago;81,39
+Contrato;ANNA LAURA SADER CABRAL MAGALHAES;2x/semana;269,00;Pago;115,94
+Contrato;CAROLINA VILLEFORT LEÃO;1x/semana;189,00;Pago;81,39
+Contrato;BEATRIZ ARAÚJO DE MENDONÇA ASSIS;1x/semana;189,00;Pago;81,39
+Contrato;VICTORIA MARIA MOREIRA ROTT;2x/semana;;Estornado;
+Contrato;LUISA GORGULHO VIOTTI;2x/semana;269,00;Pago;115,94
+Contrato;MARCELLA VIEIRA GORI;2x/semana;269,00;Pago;115,94
+Contrato;ETIENNE LISBOA DA COSTA JUNIOR;1x/semana;189,00;Pago;81,39
+Contrato;CLAUDINEI ESPOSITO;1x/semana;189,00;Pago;81,39
+Contrato;YASMIN CEOLIN;2x/semana;269,00;Confirmado (cartão);117,21
+Contrato;PEDRO HENRIQUE AYRES FAGUNDES;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;MATEUS MALVAR;1x/semana;189,00;Pago;81,39
+Contrato;LUCCA GUIMARÃES TEMPONI;1x/semana;189,00;Pago;81,39
+Contrato;MARIANA RIEVRS VIEIRA;1x/semana;189,00;Pago;81,39
+Contrato;JÚLIA CARVALHO DE PAULA SILVA;1x/semana;189,00;Pago;81,39
+Contrato;DANIEL PARDINI;3x/semana;329,00;Pago;141,85
+Contrato;STELLA BRUNAUER SOUZA;1x/semana;189,00;Pago;81,39
+Contrato;CLARA RABELO;1x/semana;189,00;Pago;81,39
+Contrato;VINICIUS DE ALMEIDA CAVALCANTE GALDINO;2x/semana;269,00;Pago;115,94
+Contrato;JULIA COUTO SILVA PRIMORAC;2x/semana;269,00;Pago;115,94
+Contrato;RODRIGO PORTELA;1x/semana;189,00;Pago;81,39
+Contrato;CÉSAR  DE SOUZA MESQUITA;1x/semana;189,00;Pago;81,39
+Contrato;MATEUS HENRIQUE LANA FERNANDES;2x/semana;269,00;Pago;115,94
+Contrato;CARLOS EDUARDO CARNEIRO;2x/semana;;Estornado;
+Contrato;ANTONIO CESAR DA SILVA FERREIRA;1x/semana;189,00;Confirmado (cartão);82,28
+Contrato;TIAGO DELGADO ROCHA;1x/semana;189,00;Pago;81,39
+Contrato;LORENZO FERREIRA HERMOGENES PEREIRA;2x/semana;269,00;Pago;115,94
+Contrato;ARTHUR MALIO RODRIGUES BRANDÃO;2x/semana;269,00;Pago;115,94
+Contrato;MIGUEL MÁXIMO ABRAS PINTO COELHO;2x/semana;269,00;Pago;115,94
+Contrato;VITORIA LIZ BITAR BALBINO DE ALMEIDA;3x/semana;;Vencido;
+Contrato;INGRID MAGALHÃES;1x/semana;189,00;Pago;81,39
+Contrato;LUCAS GONTIJO RIANI;2x/semana;269,00;Pago;115,94
+Contrato;LUÍZA FILIZZOLA CARABETTI CARREIRO;2x/semana;269,00;Pago;115,94
+Contrato;VICTOR PASSOS DOMINGUES;1x/semana;189,00;Pago;81,39
+Contrato;PEDRO COURA;2x/semana;269,00;Pago;115,94
+Contrato;PEDRO MOURA;2x/semana;269,00;Pago;115,94
+Contrato;LUCAS MOURA;1x/semana;;Estornado;
+Contrato;THIAGO HENRIQUE SANTOS;1x/semana;189,00;Pago;81,39
+Contrato;LETICIA VIANA;2x/semana;269,00;Pago;115,94
+Contrato;VICTOR FARAH DIAS;1x/semana;189,00;Pago;81,39
+Contrato;VIVIANE ARAÚJO RIBEIRO;2x/semana;269,00;Pago;115,94
+Contrato;PEDRO HENRIQUE TEIXEIRA;2x/semana;269,00;Pago;115,94
+Contrato;PEDRO PAULISTANO;1x/semana;189,00;Pago;81,39
+Contrato;YAN RIBEIRO BARCELOS;2x/semana;269,00;Pago;115,94
+Contrato;ESDRAS OSCAR BARBOSA CARVALHO OLIVEIRA;1x/semana | FLEX;149,00;Pago;64,12
+Contrato;JOAO PEDRO LOPES;1x/semana;;Estornado;
+Avulsa;ÍCARO  RODRIGUES CARLOS CÂNDIDO;Altera��o de plano - Futev�lei;42,00;Confirmado (cartão);18,11
+Avulsa;PEDRO MAGALHÃES ASSIS CHAMI;Altera��o de plano;26,67;Pago;11,10
+Avulsa;ALANA FROEDE LORENTZ RODRIGUES;Altera��o de contrato;80,00;Confirmado (cartão);34,70
+Avulsa;JULIA VELOSO;Altera��o de plano;80,00;Confirmado (cartão);34,70
+
+TOTAL PROFESSOR;;;;;30088,82

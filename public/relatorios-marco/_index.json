@@ -1,0 +1,40 @@
+[
+  {
+    "slug": "futevlei",
+    "mod": {
+      "nome": "Futevôlei",
+      "professor": "Leuzera",
+      "pct": 45
+    },
+    "file": "/relatorios-marco/futevlei.html",
+    "count": 333
+  },
+  {
+    "slug": "beach-tennis",
+    "mod": {
+      "nome": "Beach Tennis",
+      "professor": "Prof. BT",
+      "pct": 40
+    },
+    "file": "/relatorios-marco/beach-tennis.html",
+    "count": 198
+  },
+  {
+    "slug": "futevlei-personal",
+    "mod": {
+      "nome": "Futevôlei Personal",
+      "professor": "Cardoso",
+      "pct": 45
+    },
+    "file": "/relatorios-marco/futevlei-personal.html",
+    "count": 6
+  },
+  {
+    "slug": "avulsas",
+    "mod": {
+      "nome": "Cobranças Avulsas"
+    },
+    "file": "/relatorios-marco/avulsas.html",
+    "count": 5
+  }
+]

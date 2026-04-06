@@ -9,8 +9,8 @@
     "badge": "77",
     "icon": "📋",
     "createdAt": "2026-03-26T12:00:00.000Z",
-    "archived": false,
-    "archivedAt": null
+    "archived": true,
+    "archivedAt": "2026-04-06T01:00:44.388Z"
   },
   {
     "id": "dl-parou-pagar",
@@ -22,8 +22,8 @@
     "badge": "32",
     "icon": "📋",
     "createdAt": "2026-03-26T12:00:00.000Z",
-    "archived": false,
-    "archivedAt": null
+    "archived": true,
+    "archivedAt": "2026-04-06T01:00:41.711Z"
   },
   {
     "id": "dl-vencidas-detalhe",
@@ -35,7 +35,125 @@
     "badge": "120",
     "icon": "🔗",
     "createdAt": "2026-03-26T12:00:00.000Z",
+    "archived": true,
+    "archivedAt": "2026-04-06T01:00:42.972Z"
+  },
+  {
+    "id": "dl-1775436852502",
+    "name": "Antecipação Leuzera — 05/04/2026",
+    "description": "Resumo financeiro completo: R$ 31.899 já recebidos, R$ 19.150 antecipáveis (194 cobranças detalhadas por data), R$ 8.838 chegando naturalmente entre 07–14/04.",
+    "url": "/antecipacao-leuzera-05042026.md",
+    "filename": "antecipacao-leuzera-05042026.md",
+    "tag": "Leuzera",
+    "badge": "194",
+    "icon": "⚡",
+    "createdAt": "2026-04-06T00:54:12.502Z",
     "archived": false,
     "archivedAt": null
+  },
+  {
+    "id": "dl-1775437381091",
+    "name": "Antecipação Leuzera — 05/04/2026",
+    "description": "Resumo completo: cobranças elegíveis por data, taxas reais Asaas, somátorio das não antecipáveis. Botão de execução direta.",
+    "url": "/antecipacao-leuzera.html",
+    "filename": "",
+    "tag": "Leuzera",
+    "badge": "194",
+    "icon": "⚡",
+    "createdAt": "2026-04-06T01:03:01.091Z",
+    "archived": false,
+    "archivedAt": null
+  },
+  {
+    "id": "dl-1775438824077",
+    "name": "Futevôlei — Março 2026",
+    "description": "333 cobranças · Leuzera 45% · Prof. recebe R$ 30.088,82",
+    "url": "/relatorios-marco/futevlei.html",
+    "filename": "",
+    "tag": "Futevôlei",
+    "badge": "333",
+    "icon": "⚽",
+    "createdAt": "2026-04-06T01:27:04.077Z",
+    "archived": false,
+    "archivedAt": null
+  },
+  {
+    "id": "dl-1775438824086",
+    "name": "Beach Tennis — Março 2026",
+    "description": "198 cobranças · Prof. BT 40% · Prof. recebe R$ 19.740,55",
+    "url": "/relatorios-marco/beach-tennis.html",
+    "filename": "",
+    "tag": "Beach Tennis",
+    "badge": "198",
+    "icon": "🎾",
+    "createdAt": "2026-04-06T01:27:04.086Z",
+    "archived": false,
+    "archivedAt": null
+  },
+  {
+    "id": "dl-1775438824090",
+    "name": "Futevôlei Personal — Março 2026",
+    "description": "6 cobranças · Cardoso 45% · Prof. recebe R$ 1.227,12",
+    "url": "/relatorios-marco/futevlei-personal.html",
+    "filename": "",
+    "tag": "Futevôlei Personal",
+    "badge": "6",
+    "icon": "⚽",
+    "createdAt": "2026-04-06T01:27:04.090Z",
+    "archived": false,
+    "archivedAt": null
+  },
+  {
+    "id": "dl-1775438824094",
+    "name": "Cobranças Avulsas — Março 2026",
+    "description": "5 cobranças avulsas sem split de professor",
+    "url": "/relatorios-marco/avulsas.html",
+    "filename": "",
+    "tag": "Avulsas",
+    "badge": "5",
+    "icon": "🧾",
+    "createdAt": "2026-04-06T01:27:04.094Z",
+    "archived": false,
+    "archivedAt": null
+  },
+  {
+    "id": "csv-futevlei",
+    "name": "Futevôlei — Março 2026 (CSV)",
+    "icon": "📊",
+    "url": "/relatorios-marco/futevlei.csv",
+    "filename": "futevlei-marco2026.csv",
+    "tag": "CSV",
+    "createdAt": "2026-04-06T12:39:36.242Z",
+    "archived": false
+  },
+  {
+    "id": "csv-beach-tennis",
+    "name": "Beach Tennis — Março 2026 (CSV)",
+    "icon": "📊",
+    "url": "/relatorios-marco/beach-tennis.csv",
+    "filename": "beach-tennis-marco2026.csv",
+    "tag": "CSV",
+    "createdAt": "2026-04-06T12:39:36.242Z",
+    "archived": false
+  },
+  {
+    "id": "csv-futevlei-personal",
+    "name": "Futevôlei Personal — Março 2026 (CSV)",
+    "icon": "📊",
+    "url": "/relatorios-marco/futevlei-personal.csv",
+    "filename": "futevlei-personal-marco2026.csv",
+    "tag": "CSV",
+    "createdAt": "2026-04-06T12:39:36.242Z",
+    "archived": false
+  },
+  {
+    "id": "csv-avulsas",
+    "name": "Cobranças Avulsas — Março 2026 (CSV)",
+    "icon": "📊",
+    "url": "/relatorios-marco/avulsas.csv",
+    "filename": "avulsas-marco2026.csv",
+    "tag": "CSV",
+    "createdAt": "2026-04-06T12:39:36.242Z",
+    "archived": false
   }
 ]

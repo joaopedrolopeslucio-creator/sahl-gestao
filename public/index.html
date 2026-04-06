@@ -147,6 +147,9 @@
       <button class="nav-item" onclick="openTool(this,'https://fluxo.sahl.com.br','💰','Fluxo de Caixa')">
         <span class="nav-icon">💰</span><span class="nav-name">Fluxo de Caixa</span><span class="nav-dot"></span>
       </button>
+      <button class="nav-item" onclick="openTool(this,'/cobranca-avulsa','🧾','Cobrança Avulsa')">
+        <span class="nav-icon">🧾</span><span class="nav-name">Cobrança Avulsa</span><span class="nav-dot"></span>
+      </button>
       <button class="nav-item" onclick="openTool(this,'https://auditoria.sahl.com.br','🔍','Auditoria Financeira')">
         <span class="nav-icon">🔍</span><span class="nav-name">Auditoria Financeira</span><span class="nav-dot"></span>
       </button>
@@ -234,9 +237,13 @@
         <div class="wcard-top"><div class="wcard-icon blue">💬</div><div class="wcard-name">Dashboard WhatsApp</div></div>
         <div class="wcard-desc">Atendimento WAHA e status dos atendentes.</div>
       </div>
-      <div class="wcard" onclick="document.querySelector('[onclick*=\"Cobrança\"]').click()">
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Cobrança Ativa\"]').click()">
         <div class="wcard-top"><div class="wcard-icon amber">💰</div><div class="wcard-name">Cobrança Ativa</div></div>
         <div class="wcard-desc">Disparo controlado de cobranças via WhatsApp com IA.</div>
+      </div>
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Avulsa\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon green">🧾</div><div class="wcard-name">Cobrança Avulsa</div></div>
+        <div class="wcard-desc">Crie cobranças pontuais com split automático por modalidade.</div>
       </div>
       <div class="wcard" onclick="document.querySelector('[onclick*=\"Posts\"]').click()">
         <div class="wcard-top"><div class="wcard-icon amber">📸</div><div class="wcard-name">Posts & Tráfego</div></div>
@@ -394,10 +401,16 @@ function openDownload(id) {
   const d = downloads.find(x => x.id === id);
   if (!d) return;
   currentDlId = id;
-  // Marca item ativo — encontra o botão pelo id
   const btn = [...document.querySelectorAll('.dl-item')].find(b => b.getAttribute('onclick') === `openDownload('${id}')`);
   setActive(btn || null);
   renderDownloads();
+
+  // HTMLs abrem no iframe; arquivos (csv, md, etc.) abrem no painel de download
+  const isHtml = d.url && (d.url.endsWith('.html') || d.url.endsWith('.htm'));
+  if (isHtml) {
+    openTool(btn || null, d.url, d.icon || '📋', d.name);
+    return;
+  }
 
   document.getElementById('welcome').style.display   = 'none';
   document.getElementById('preview').classList.remove('active');
