@@ -459,14 +459,18 @@ app.get('/api/inadimplencia/gestao', async (req, res) => {
       _inadCache = await buildInadimplencia(evo);
       _inadCacheTs = Date.now();
     }
-    syncToDb(_inadCache.ativos);
+    // Sincroniza valor_total de todos os grupos (não só ativos)
+    const todosOverdue = [
+      ..._inadCache.ativos,
+      ..._inadCache.fantasmas,
+      ...(_inadCache.naoEncontrados || []),
+    ];
+    syncToDb(todosOverdue);
 
     // Auto-recuperação: quem saiu da lista OVERDUE do Asaas foi baixado
-    const overdueAgora = new Set([
-      ..._inadCache.ativos.map(a => a.cpf),
-      ..._inadCache.fantasmas.map(a => a.cpf),
-      ...(_inadCache.naoEncontrados || []).map(a => a.cpf),
-    ].filter(Boolean));
+    const overdueAgora = new Set(todosOverdue.map(a => a.cpf).filter(Boolean));
+    const valorMap = Object.fromEntries(todosOverdue.filter(a => a.cpf).map(a => [a.cpf, a.total]));
+
     const pendentesDb = db.prepare(
       `SELECT cpf FROM gestao_clientes WHERE status_gestao NOT IN ('RECUPERADO','PERDIDO')`
     ).all();
