@@ -150,7 +150,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS gestao_clientes (
     cpf TEXT PRIMARY KEY,
     nome TEXT,
-    status_gestao TEXT DEFAULT 'EM_COBRANCA',
+    status_gestao TEXT DEFAULT 'NOVO',
     data_entrada TEXT,
     data_ultima_acao TEXT,
     data_resolucao TEXT,
@@ -166,6 +166,10 @@ db.exec(`
     responsavel TEXT
   );
 `);
+// Migração: adicionar coluna valor_total se não existir
+try { db.exec('ALTER TABLE gestao_clientes ADD COLUMN valor_total REAL DEFAULT 0'); } catch(e) {}
+// Migração: renomear status legado
+db.exec("UPDATE gestao_clientes SET status_gestao='NOVO' WHERE status_gestao='EM_COBRANCA'");
 
 // ─── Recebíveis do dia ────────────────────────────────────────────────────────
 let _recebCache = {};
@@ -428,9 +432,17 @@ app.get('/recebiveis', (req, res) => {
 
 // ─── Gestão de inadimplentes (SQLite) ────────────────────────────────────────
 function syncToDb(list) {
-  const stmt = db.prepare(`INSERT OR IGNORE INTO gestao_clientes (cpf,nome,status_gestao,data_entrada) VALUES (?,?,'EM_COBRANCA',?)`);
+  const ins = db.prepare(`INSERT OR IGNORE INTO gestao_clientes (cpf,nome,status_gestao,data_entrada,valor_total) VALUES (?,?,'NOVO',?,?)`);
+  const updValor = db.prepare(`UPDATE gestao_clientes SET nome=?, valor_total=? WHERE cpf=?`);
   const now = new Date().toISOString();
-  for (const a of list) if (a.cpf) stmt.run(a.cpf, a.nome, now);
+  const sync = db.transaction(items => {
+    for (const a of items) {
+      if (!a.cpf) continue;
+      ins.run(a.cpf, a.nome, now, a.total || 0);
+      updValor.run(a.nome, a.total || 0, a.cpf);
+    }
+  });
+  sync(list);
 }
 
 app.get('/api/inadimplencia/gestao', async (req, res) => {
@@ -460,7 +472,7 @@ app.get('/api/inadimplencia/gestao', async (req, res) => {
       const ua = acoesMap[item.cpf] || null;
       return {
         ...item,
-        statusGestao:   g.status_gestao || 'EM_COBRANCA',
+        statusGestao:   g.status_gestao || 'NOVO',
         dataEntrada:    g.data_entrada  || null,
         dataResolucao:  g.data_resolucao || null,
         observacao:     g.observacao    || '',
@@ -487,7 +499,7 @@ app.patch('/api/inadimplencia/gestao/:cpf', (req, res) => {
   const exists = db.prepare('SELECT cpf FROM gestao_clientes WHERE cpf=?').get(cpf);
   if (!exists) {
     db.prepare(`INSERT INTO gestao_clientes (cpf,nome,status_gestao,data_entrada,observacao) VALUES (?,?,?,?,?)`)
-      .run(cpf, nome || '', status_gestao || 'EM_COBRANCA', now, observacao || '');
+      .run(cpf, nome || '', status_gestao || 'NOVO', now, observacao || '');
   } else {
     const fields = [], vals = [];
     if (status_gestao !== undefined) {
@@ -508,11 +520,16 @@ app.post('/api/inadimplencia/gestao/:cpf/acao', (req, res) => {
   const now = new Date().toISOString();
   const exists = db.prepare('SELECT cpf FROM gestao_clientes WHERE cpf=?').get(cpf);
   if (!exists)
-    db.prepare(`INSERT INTO gestao_clientes (cpf,nome,status_gestao,data_entrada) VALUES (?,?,'EM_COBRANCA',?)`)
+    db.prepare(`INSERT INTO gestao_clientes (cpf,nome,status_gestao,data_entrada) VALUES (?,?,'NOVO',?)`)
       .run(cpf, nome || '', now);
   db.prepare(`INSERT INTO acoes_inadimplencia (cpf,tipo,resultado,notas,data_acao,responsavel) VALUES (?,?,?,?,?,?)`)
     .run(cpf, tipo || 'OUTRO', resultado || 'SEM_RESPOSTA', notas || '', now, 'admin');
   db.prepare(`UPDATE gestao_clientes SET data_ultima_acao=? WHERE cpf=?`).run(now, cpf);
+  // Auto-avança NOVO → EM_CONTATO na primeira ação
+  const cur = db.prepare('SELECT status_gestao FROM gestao_clientes WHERE cpf=?').get(cpf);
+  if (cur && cur.status_gestao === 'NOVO')
+    db.prepare(`UPDATE gestao_clientes SET status_gestao='EM_CONTATO' WHERE cpf=?`).run(cpf);
+  // Resultado "Pagou" → Recuperado
   if (resultado === 'PAGO')
     db.prepare(`UPDATE gestao_clientes SET status_gestao='RECUPERADO', data_resolucao=? WHERE cpf=?`).run(now, cpf);
   res.json({ ok: true });
@@ -522,6 +539,24 @@ app.get('/api/inadimplencia/gestao/:cpf/acoes', (req, res) => {
   const acoes = db.prepare(`SELECT * FROM acoes_inadimplencia WHERE cpf=? ORDER BY data_acao DESC LIMIT 50`)
     .all(req.params.cpf);
   res.json(acoes);
+});
+
+app.get('/api/inadimplencia/recuperados', (req, res) => {
+  const rows = db.prepare(`
+    SELECT g.*,
+      CAST((julianday(COALESCE(g.data_resolucao, datetime('now'))) - julianday(g.data_entrada)) AS INTEGER) as dias_para_recuperar,
+      (SELECT tipo FROM acoes_inadimplencia WHERE cpf=g.cpf ORDER BY data_acao DESC LIMIT 1) as ultimo_canal,
+      (SELECT COUNT(*) FROM acoes_inadimplencia WHERE cpf=g.cpf) as num_acoes
+    FROM gestao_clientes g
+    WHERE g.status_gestao = 'RECUPERADO'
+    ORDER BY g.data_resolucao DESC
+  `).all();
+  const total = rows.reduce((s, r) => s + (r.valor_total || 0), 0);
+  const comTempo = rows.filter(r => r.dias_para_recuperar != null && r.dias_para_recuperar >= 0);
+  const tempoMedio = comTempo.length
+    ? Math.round(comTempo.reduce((s, r) => s + r.dias_para_recuperar, 0) / comTempo.length)
+    : 0;
+  res.json({ resumo: { count: rows.length, total, tempoMedio }, clientes: rows });
 });
 
 // ─── Cobrança Avulsa ──────────────────────────────────────────────────────────

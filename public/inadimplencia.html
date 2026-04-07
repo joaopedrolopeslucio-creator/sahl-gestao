@@ -83,8 +83,9 @@
   .badge-vencido{background:#450a0a;color:#fca5a5}
   .badge-pendente{background:#451a03;color:#fcd34d}
   .badge-estornado{background:#1e293b;color:#64748b}
-  .badge-em_cobranca{background:#451a03;color:#fcd34d}
-  .badge-aguardando{background:#0c1a4a;color:#93c5fd}
+  .badge-novo{background:#1e1535;color:#a78bfa}
+  .badge-em_contato{background:#0c2340;color:#60a5fa}
+  .badge-aguardando{background:#422006;color:#fcd34d}
   .badge-recuperado{background:#14532d;color:#86efac}
   .badge-perdido{background:#1e293b;color:#475569}
   .meses{color:#94a3b8;font-size:11px}
@@ -133,8 +134,9 @@
   .status-btn{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;opacity:.5}
   .status-btn:hover{opacity:.8}
   .status-btn.active{opacity:1}
-  .status-btn.em_cobranca{background:#451a03;color:#fcd34d;border-color:#78350f}
-  .status-btn.aguardando{background:#0c1a4a;color:#93c5fd;border-color:#1e3a7a}
+  .status-btn.novo{background:#1e1535;color:#a78bfa;border-color:#3b2a6a}
+  .status-btn.em_contato{background:#0c2340;color:#60a5fa;border-color:#1e4080}
+  .status-btn.aguardando{background:#422006;color:#fcd34d;border-color:#713f12}
   .status-btn.recuperado{background:#14532d;color:#86efac;border-color:#166534}
   .status-btn.perdido{background:#1a1f2e;color:#475569;border-color:#2a3050}
   .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -174,6 +176,7 @@
   <button class="main-tab" onclick="setMainTab('ativos',this)">Inadimplentes Ativos <span class="cnt" id="cnt-ativos"></span></button>
   <button class="main-tab" onclick="setMainTab('fantasmas',this)">Fantasmas <span class="cnt" id="cnt-fantasmas"></span></button>
   <button class="main-tab" onclick="setMainTab('naoEnc',this)">Não encontrados <span class="cnt" id="cnt-naoenc"></span></button>
+  <button class="main-tab" onclick="setMainTab('recuperados',this)" style="color:#22c55e">Recuperados <span class="cnt" id="cnt-recup" style="background:rgba(34,197,94,.15);color:#86efac"></span></button>
 </div>
 
 <!-- ── Área de cards (muda conforme aba) ── -->
@@ -218,10 +221,11 @@
       <div>
         <div class="section-label">Status da gestão</div>
         <div class="status-group">
-          <button class="status-btn em_cobranca" data-s="EM_COBRANCA" onclick="setStatus('EM_COBRANCA')">Em cobrança</button>
-          <button class="status-btn aguardando"  data-s="AGUARDANDO"  onclick="setStatus('AGUARDANDO')">Aguardando</button>
-          <button class="status-btn recuperado"  data-s="RECUPERADO"  onclick="setStatus('RECUPERADO')">Recuperado</button>
-          <button class="status-btn perdido"     data-s="PERDIDO"     onclick="setStatus('PERDIDO')">Perdido</button>
+          <button class="status-btn novo"       data-s="NOVO"       onclick="setStatus('NOVO')">Novo</button>
+          <button class="status-btn em_contato" data-s="EM_CONTATO" onclick="setStatus('EM_CONTATO')">Em contato</button>
+          <button class="status-btn aguardando" data-s="AGUARDANDO" onclick="setStatus('AGUARDANDO')">Aguardando</button>
+          <button class="status-btn recuperado" data-s="RECUPERADO" onclick="setStatus('RECUPERADO')">Recuperado</button>
+          <button class="status-btn perdido"    data-s="PERDIDO"    onclick="setStatus('PERDIDO')">Perdido</button>
         </div>
       </div>
       <div>
@@ -285,7 +289,7 @@ var _today    = new Date().toISOString().slice(0, 10);
 
 var TIPO_LABEL   = { WHATSAPP:'WhatsApp', LIGACAO:'Ligação', EMAIL:'E-mail', REENVIO:'Reenvio', TROCA_CARTAO:'Troca cartão', OUTRO:'Outro' };
 var RESULT_LABEL = { SEM_RESPOSTA:'Sem resposta', AGUARDANDO:'Aguardando', PROMETEU:'Prometeu pagar', RECUSOU:'Recusou', PAGO:'Pagou' };
-var STATUS_LABEL = { EM_COBRANCA:'Em cobrança', AGUARDANDO:'Aguardando', RECUPERADO:'Recuperado', PERDIDO:'Perdido' };
+var STATUS_LABEL = { NOVO:'Novo', EM_CONTATO:'Em contato', AGUARDANDO:'Aguardando', RECUPERADO:'Recuperado', PERDIDO:'Perdido' };
 var RESULT_COLORS= { SEM_RESPOSTA:'#475569', AGUARDANDO:'#60a5fa', PROMETEU:'#f59e0b', RECUSOU:'#ef4444', PAGO:'#22c55e' };
 
 // ── Main tab switch ───────────────────────────────────────────────────────────
@@ -299,6 +303,13 @@ function setMainTab(tab, btn) {
     renderToolbarRec();
     if (_dadosR) { renderCardsRec(); renderRecovery(); renderTabelaRec(); }
     else loadRec();
+  } else if (tab === 'recuperados') {
+    document.getElementById('toolbar').innerHTML =
+      '<input class="search" id="search-rec" type="text" placeholder="Buscar por nome..." oninput="renderTabelaRecuperados()">' +
+      '<div class="ml-auto"></div>' +
+      '<button class="btn btn-gray" onclick="loadRecuperados(true)">↻ Atualizar</button>' +
+      '<span class="upd" id="upd-rec"></span>';
+    loadRecuperados();
   } else {
     _filterDias = '';
     renderToolbarGest();
@@ -449,7 +460,8 @@ function renderToolbarGest() {
     '<input class="search" id="search-g" type="text" placeholder="Buscar por nome ou CPF..." oninput="renderTabelaGest()">' +
     '<select class="search" id="filter-status" onchange="renderTabelaGest()">' +
       '<option value="">Todos os status</option>' +
-      '<option value="EM_COBRANCA">Em cobrança</option>' +
+      '<option value="NOVO">Novo (sem contato)</option>' +
+      '<option value="EM_CONTATO">Em contato</option>' +
       '<option value="AGUARDANDO">Aguardando</option>' +
       '<option value="RECUPERADO">Recuperado</option>' +
       '<option value="PERDIDO">Perdido</option>' +
@@ -702,6 +714,70 @@ async function loadHistory(cpf) {
         '</div>';
     }).join('');
   } catch(e){wrap.innerHTML='<div class="history-empty">Erro ao carregar histórico.</div>';}
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RECUPERADOS
+// ─────────────────────────────────────────────────────────────────────────────
+var _dadosRec = null;
+
+async function loadRecuperados(refresh) {
+  document.getElementById('tabela-wrap').innerHTML = '<div class="loading">Carregando recuperados...</div>';
+  document.getElementById('cards').innerHTML = '<div class="card"><div class="card-label">Carregando...</div></div>';
+  try {
+    _dadosRec = await fetch('/api/inadimplencia/recuperados'+(refresh?'?t='+Date.now():'')).then(function(r){return r.json();});
+    document.getElementById('cnt-recup').textContent = _dadosRec.resumo.count;
+    renderCardsRecuperados();
+    renderTabelaRecuperados();
+    var el = document.getElementById('upd-rec');
+    if (el) el.textContent = 'às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  } catch(e) {
+    document.getElementById('tabela-wrap').innerHTML = '<div class="empty">Erro: '+esc(e.message)+'</div>';
+  }
+}
+
+function renderCardsRecuperados() {
+  var s = _dadosRec.resumo;
+  document.getElementById('cards').innerHTML =
+    card('ok',   s.count,                    'Recuperados',           'Inadimplentes que pagaram') +
+    card('ok',   'R$\u00A0'+fmt(s.total),    'Total recuperado',      'Valor total recebido') +
+    card('blue', s.tempoMedio+'d',           'Tempo médio',           'Dias até pagamento') +
+    card('',     '',                         '',                      '');
+}
+
+function renderTabelaRecuperados() {
+  if (!_dadosRec) return;
+  var q = ((document.getElementById('search-rec')||{}).value||'').toLowerCase();
+  var rows = _dadosRec.clientes.filter(function(r){
+    return !q || r.nome.toLowerCase().includes(q) || r.cpf.includes(q);
+  });
+  if (!rows.length) {
+    document.getElementById('tabela-wrap').innerHTML = '<div class="empty">Nenhum recuperado encontrado.</div>';
+    return;
+  }
+  var CANAL_LABEL = { WHATSAPP:'WhatsApp', LIGACAO:'Ligação', EMAIL:'E-mail', REENVIO:'Reenvio', TROCA_CARTAO:'Troca cartão', OUTRO:'Outro' };
+  var html='<table><thead><tr>'+
+    '<th>#</th><th>Nome</th><th>CPF</th><th>Valor</th><th>Entrou em</th><th>Recuperado em</th><th>Dias</th><th>Canal</th><th>Ações</th>'+
+    '</tr></thead><tbody>';
+  rows.forEach(function(r,i){
+    var entrou   = fmtDateISO(r.data_entrada);
+    var recuperou= fmtDateISO(r.data_resolucao);
+    var dias     = r.dias_para_recuperar != null ? r.dias_para_recuperar+'d' : '—';
+    var canal    = r.ultimo_canal ? CANAL_LABEL[r.ultimo_canal]||r.ultimo_canal : '—';
+    var numAcoes = r.num_acoes || 0;
+    html+='<tr>'+
+      '<td class="cobr-count">'+(i+1)+'</td>'+
+      '<td>'+esc(r.nome)+'</td>'+
+      '<td class="meses">'+r.cpf+'</td>'+
+      '<td class="valor">R$\u00A0'+(r.valor_total||0).toFixed(2).replace('.',',')+'</td>'+
+      '<td class="meses">'+entrou+'</td>'+
+      '<td class="meses" style="color:#22c55e">'+recuperou+'</td>'+
+      '<td><span class="badge badge-recuperado">'+dias+'</span></td>'+
+      '<td class="meses">'+canal+'</td>'+
+      '<td class="cobr-count" style="color:#64748b">'+numAcoes+'x</td>'+
+      '</tr>';
+  });
+  document.getElementById('tabela-wrap').innerHTML=html+'</tbody></table>';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
