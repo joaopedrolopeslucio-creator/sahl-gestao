@@ -19,6 +19,10 @@
 
   /* ── Cards ── */
   .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px}
+  .cards.five{grid-template-columns:repeat(4,1fr) 160px}
+  .card.total-geral{background:#0f1220;border-color:#1e293b;display:flex;flex-direction:column;justify-content:center}
+  .card.total-geral .card-label{color:#334155}
+  .card.total-geral .card-value{font-size:16px;color:#475569}
   .card{background:#1e293b;border:1px solid #334155;border-radius:10px;padding:16px 18px}
   .card-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
   .card-value{font-size:22px;font-weight:700;color:#e2e8f0}
@@ -394,6 +398,7 @@ function updateSubTabCounts(s) {
 
 function renderCardsRec() {
   var s = _dadosR.resumo;
+  document.getElementById('cards').className = 'cards';
   document.getElementById('cards').innerHTML =
     card('', 'R$\u00A0'+fmt(s.esperado),  'Esperado',  s.countTotal+' cobranças') +
     card('ok',   'R$\u00A0'+fmt(s.recebido),  'Recebido',  s.countPago+' pagas · '+s.taxaRecuperacao.toFixed(1)+'%') +
@@ -511,6 +516,7 @@ function renderCardsGest() {
   });
   var total = d.ativos.reduce(function(s,x){return s+x.total;},0);
 
+  document.getElementById('cards').className = 'cards five';
   document.getElementById('cards').innerHTML =
     '<div class="card danger" style="border-color:#7f1d1d">' +
       '<div class="card-label">Crítico · 30+ dias</div>' +
@@ -531,6 +537,11 @@ function renderCardsGest() {
       '<div class="card-label">Baixo · até 7 dias</div>' +
       '<div class="card-value" style="color:#64748b">R$\u00A0'+fmt(tiers.baixo.v)+'</div>' +
       '<div class="card-sub">'+tiers.baixo.n+' inadimplentes · '+pct(tiers.baixo.v,total)+'% do total</div>' +
+    '</div>' +
+    '<div class="card total-geral">' +
+      '<div class="card-label">Total geral</div>' +
+      '<div class="card-value">R$\u00A0'+fmt(total)+'</div>' +
+      '<div class="card-sub">'+d.ativos.length+' inadimplentes</div>' +
     '</div>';
 }
 
@@ -762,6 +773,7 @@ async function loadRecuperados(refresh) {
 
 function renderCardsRecuperados() {
   var s = _dadosRec.resumo;
+  document.getElementById('cards').className = 'cards';
   document.getElementById('cards').innerHTML =
     card('ok',   s.count,                    'Recuperados',           'Inadimplentes que pagaram') +
     card('ok',   'R$\u00A0'+fmt(s.total),    'Total recuperado',      'Valor total recebido') +
