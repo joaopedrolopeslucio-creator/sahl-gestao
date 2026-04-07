@@ -438,7 +438,7 @@ app.get('/recebiveis', (req, res) => {
 // ─── Gestão de inadimplentes (SQLite) ────────────────────────────────────────
 function syncToDb(list) {
   const ins = db.prepare(`INSERT OR IGNORE INTO gestao_clientes (cpf,nome,status_gestao,data_entrada,valor_total) VALUES (?,?,'NOVO',?,?)`);
-  const updValor = db.prepare(`UPDATE gestao_clientes SET nome=?, valor_total=? WHERE cpf=?`);
+  const updValor = db.prepare(`UPDATE gestao_clientes SET nome=?, valor_total=? WHERE cpf=? AND status_gestao NOT IN ('RECUPERADO','PERDIDO')`);
   const now = new Date().toISOString();
   const sync = db.transaction(items => {
     for (const a of items) {
@@ -477,9 +477,13 @@ app.get('/api/inadimplencia/gestao', async (req, res) => {
     const nowAuto = new Date().toISOString();
     for (const row of pendentesDb) {
       if (row.cpf && !overdueAgora.has(row.cpf)) {
+        // Preserva valor_total se já estava preenchido; caso contrário usa o valorMap (última snapshot)
+        const valorSalvo = row.valor_total && row.valor_total > 0
+          ? row.valor_total
+          : (valorMap[row.cpf] || 0);
         db.prepare(
-          `UPDATE gestao_clientes SET status_gestao='RECUPERADO', data_resolucao=? WHERE cpf=?`
-        ).run(nowAuto, row.cpf);
+          `UPDATE gestao_clientes SET status_gestao='RECUPERADO', data_resolucao=?, valor_total=? WHERE cpf=?`
+        ).run(nowAuto, valorSalvo, row.cpf);
       }
     }
 
