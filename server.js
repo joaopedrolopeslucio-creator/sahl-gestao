@@ -305,7 +305,9 @@ async function buildInadimplencia(evoMembers) {
   for (const m of evoMembers) {
     const cpf = (m.document || '').replace(/\D/g, '');
     if (!cpf || cpf === '00000000000') continue;
-    evoMap[cpf] = { status: m.membershipStatus || m.status, nome: (m.firstName + ' ' + m.lastName).trim() };
+    const celContact = (m.contacts || []).find(c => c.contactType === 'Cellphone' || c.idContactType === 2);
+    const telEvo = celContact ? celContact.description.replace(/\D/g, '') : '';
+    evoMap[cpf] = { status: m.membershipStatus || m.status, nome: (m.firstName + ' ' + m.lastName).trim(), telefone: telEvo };
   }
 
   // Fetch all overdue payments from Asaas
@@ -344,7 +346,10 @@ async function buildInadimplencia(evoMembers) {
     const cpf = cust.cpf || '';
     const nome = cust.nome || custId;
     const key = cpf || custId;
-    if (!byCpf[key]) byCpf[key] = { nome, cpf, telefone: cust.telefone || '', cobras: [], total: 0 };
+    if (!byCpf[key]) {
+      const telEvo = (cpf && evoMap[cpf]) ? evoMap[cpf].telefone : '';
+      byCpf[key] = { nome, cpf, telefone: telEvo || cust.telefone || '', cobras: [], total: 0 };
+    }
     for (const p of pmts) {
       byCpf[key].cobras.push({ valor: p.value, venc: p.dueDate, plano: p.description || '', link: p.invoiceUrl || '' });
       byCpf[key].total += p.value;
