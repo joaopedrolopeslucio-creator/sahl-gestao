@@ -94,6 +94,19 @@
   .loading{text-align:center;padding:60px;color:#475569}
   .tag-acum{background:#3b1a00;color:#fb923c;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:600}
   .tag-1mes{background:#1a2d1a;color:#86efac;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:600}
+
+  /* ── Criticidade ── */
+  .dias-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap}
+  .dias-critico{background:#450a0a;color:#fca5a5}
+  .dias-alto{background:#431407;color:#fdba74}
+  .dias-medio{background:#451a03;color:#fcd34d}
+  .dias-baixo{background:#1e293b;color:#64748b}
+  tr.row-critico td{background:rgba(239,68,68,.04)}
+  tr.row-critico td:first-child{border-left:3px solid #ef4444;padding-left:10px}
+  tr.row-alto    td{background:rgba(249,115,22,.03)}
+  tr.row-alto    td:first-child{border-left:3px solid #f97316;padding-left:10px}
+  tr.row-medio   td:first-child{border-left:3px solid #eab308;padding-left:10px}
+  tr.row-critico:hover td,tr.row-alto:hover td,tr.row-medio:hover td{background:#0f172a88}
   .nome-cell small{display:block;font-size:10.5px;color:#475569;margin-top:1px}
   .link-fatura{display:inline-flex;align-items:center;gap:3px;color:#6366f1;font-size:11px;text-decoration:none;padding:2px 8px;border:1px solid #2d2f60;border-radius:4px;transition:all .15s}
   .link-fatura:hover{background:#1e1f4a;color:#a5b4fc}
@@ -258,12 +271,13 @@
 
 <script>
 // ── State ─────────────────────────────────────────────────────────────────────
-var _mainTab  = 'recebiveis';
-var _subTabR  = 'todos';      // sub-tab de recebíveis
-var _dadosR   = null;         // dados recebíveis
-var _dadosG   = null;         // dados gestão
-var _modalCpf = null;
-var _modalNome= null;
+var _mainTab   = 'recebiveis';
+var _subTabR   = 'todos';
+var _filterDias = '';
+var _dadosR    = null;
+var _dadosG    = null;
+var _modalCpf  = null;
+var _modalNome = null;
 var _today    = new Date().toISOString().slice(0, 10);
 
 var TIPO_LABEL   = { WHATSAPP:'WhatsApp', LIGACAO:'Ligação', EMAIL:'E-mail', REENVIO:'Reenvio', TROCA_CARTAO:'Troca cartão', OUTRO:'Outro' };
@@ -283,6 +297,7 @@ function setMainTab(tab, btn) {
     if (_dadosR) { renderCardsRec(); renderRecovery(); renderTabelaRec(); }
     else loadRec();
   } else {
+    _filterDias = '';
     renderToolbarGest();
     if (_dadosG) { renderCardsGest(); renderTabelaGest(); }
     else loadGest();
@@ -423,7 +438,8 @@ function renderTabelaRec() {
 // GESTÃO (ativos / fantasmas / naoEnc)
 // ─────────────────────────────────────────────────────────────────────────────
 function renderToolbarGest() {
-  var showCsv = _mainTab === 'ativos' || _mainTab === 'fantasmas';
+  var showCsv  = _mainTab === 'ativos' || _mainTab === 'fantasmas';
+  var showDias = _mainTab === 'ativos';
   document.getElementById('toolbar').innerHTML =
     '<input class="search" id="search-g" type="text" placeholder="Buscar por nome ou CPF..." oninput="renderTabelaGest()">' +
     '<select class="search" id="filter-status" onchange="renderTabelaGest()">' +
@@ -433,6 +449,15 @@ function renderToolbarGest() {
       '<option value="RECUPERADO">Recuperado</option>' +
       '<option value="PERDIDO">Perdido</option>' +
     '</select>' +
+    (showDias ?
+      '<select class="search" id="filter-dias" onchange="_filterDias=this.value;renderTabelaGest()" style="width:175px">' +
+        '<option value="">Todos os períodos</option>' +
+        '<option value="critico">30+ dias (Crítico)</option>' +
+        '<option value="alto">16–30 dias (Alto)</option>' +
+        '<option value="medio">8–15 dias (Médio)</option>' +
+        '<option value="baixo">Até 7 dias (Baixo)</option>' +
+      '</select>'
+    : '') +
     (showCsv ? '<button class="btn btn-green ml-auto" onclick="downloadCsv()">⬇ CSV</button>' : '<div class="ml-auto"></div>') +
     '<button class="btn btn-gray" onclick="loadGest(true)">↻ Atualizar</button>' +
     '<span class="upd" id="upd-g"></span>';
@@ -462,22 +487,50 @@ function renderCardsGest() {
   var tA = d.ativos.reduce(function(s,x){return s+x.total;},0);
   var tF = d.fantasmas.reduce(function(s,x){return s+x.total;},0);
   var acum = d.ativos.filter(function(a){return a.meses.length>1;}).length;
+  var criticos = d.ativos.filter(function(a){ return calcDiasAtraso(a.cobras) >= 30; }).length;
   document.getElementById('cards').innerHTML =
     card('warn',   d.ativos.length,                'Inadimplentes ativos',  'Alunos Active no EVO com cobrança vencida') +
-    card('danger', d.fantasmas.length,             'Fantasmas no Asaas',    'Cancelados no EVO mas ainda cobrados') +
+    card('danger', criticos,                       'Críticos (30+ dias)',   'Exigem contato imediato') +
     card('danger', 'R$\u00A0'+fmt(tA+tF),          'Total em aberto',       'Ativos R$\u00A0'+fmt(tA)+' + Fantasmas R$\u00A0'+fmt(tF)) +
     card('warn',   acum,                           'Dívida acumulada',      'Inadimplentes com 2+ meses em atraso');
 }
 
+function calcDiasAtraso(cobras) {
+  if (!cobras || !cobras.length) return 0;
+  var earliest = cobras.map(function(c){return c.venc;}).sort()[0];
+  var d = new Date(earliest+'T12:00:00');
+  var t = new Date(_today+'T12:00:00');
+  return Math.max(0, Math.floor((t-d)/(1000*60*60*24)));
+}
+
+function nivelCriticidade(dias) {
+  if (dias >= 30) return 'critico';
+  if (dias >= 16) return 'alto';
+  if (dias >= 8)  return 'medio';
+  return 'baixo';
+}
+
 function renderTabelaGest() {
   if (!_dadosG) return;
-  var q  = ((document.getElementById('search-g')||{}).value||'').toLowerCase();
-  var fs = ((document.getElementById('filter-status')||{}).value||'');
+  var q   = ((document.getElementById('search-g')||{}).value||'').toLowerCase();
+  var fs  = ((document.getElementById('filter-status')||{}).value||'');
+  var fd  = _filterDias;
   var srcMap = { ativos: _dadosG.ativos, fantasmas: _dadosG.fantasmas, naoEnc: _dadosG.naoEncontrados||[] };
-  var rows   = (srcMap[_mainTab]||[]).filter(function(r){
+
+  var rows = (srcMap[_mainTab]||[]).map(function(r){
+    return Object.assign({}, r, { _dias: calcDiasAtraso(r.cobras), _nivel: nivelCriticidade(calcDiasAtraso(r.cobras)) });
+  }).filter(function(r){
     if (q  && !r.nome.toLowerCase().includes(q) && !r.cpf.includes(q)) return false;
     if (fs && r.statusGestao !== fs) return false;
+    if (fd && r._nivel !== fd) return false;
     return true;
+  });
+
+  // Ordena por criticidade → total desc
+  var ordemNivel = {critico:0, alto:1, medio:2, baixo:3};
+  rows.sort(function(a,b){
+    var nd = (ordemNivel[a._nivel]??9) - (ordemNivel[b._nivel]??9);
+    return nd !== 0 ? nd : b.total - a.total;
   });
 
   if (!rows.length) { document.getElementById('tabela-wrap').innerHTML='<div class="empty">Nenhum registro encontrado.</div>'; return; }
@@ -488,13 +541,17 @@ function renderTabelaGest() {
   var html='<table><thead><tr>'+
     '<th>#</th><th>Nome</th><th>CPF</th>'+
     (isFantasma?'<th>Status EVO</th>':'')+
+    (isAtivo?'<th>Atraso</th>':'')+
     '<th>Vencimento(s)</th><th>Cobr.</th><th>Total</th>'+
     (isAtivo?'<th>Gestão</th><th>Última ação</th><th></th>':'')+
     '</tr></thead><tbody>';
 
+  var NIVEL_LABEL = {critico:'Crítico', alto:'Alto', medio:'Médio', baixo:'Baixo'};
+
   rows.forEach(function(r,i){
     var acum = r.meses&&r.meses.length>1;
     var tag  = acum?'<span class="tag-acum">acumulado</span>':'<span class="tag-1mes">1 mês</span>';
+    var rowCls = isAtivo ? ' class="row-'+r._nivel+'"' : '';
     var evoCol='';
     if (isFantasma) {
       var sc=r.evoStatus==='Suspended'?'badge-suspended':'badge-inactive';
@@ -503,6 +560,10 @@ function renderTabelaGest() {
     }
     var datas=(r.cobras||[]).map(function(c){return c.venc;}).sort()
       .map(function(v){var p=v.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);}).join('<br>');
+    var diasCol='';
+    if (isAtivo) {
+      diasCol='<td><span class="dias-badge dias-'+r._nivel+'">'+r._dias+'d · '+NIVEL_LABEL[r._nivel]+'</span></td>';
+    }
     var gestCols='';
     if (isAtivo) {
       var sg=(r.statusGestao||'EM_COBRANCA').toLowerCase();
@@ -522,11 +583,12 @@ function renderTabelaGest() {
           ' data-obs="'+esc(r.observacao||'')+'"'+
           ' onclick="openModal(this)">Ações</button></td>';
     }
-    html+='<tr>'+
+    html+='<tr'+rowCls+'>'+
       '<td class="cobr-count">'+(i+1)+'</td>'+
       '<td>'+esc(r.nome)+' '+tag+'</td>'+
       '<td class="meses">'+r.cpf+'</td>'+
       evoCol+
+      diasCol+
       '<td class="meses" style="line-height:1.7">'+datas+'</td>'+
       '<td class="cobr-count">'+(r.cobras||[]).length+'x</td>'+
       '<td class="valor">R$\u00A0'+r.total.toFixed(2).replace('.',',')+'</td>'+
