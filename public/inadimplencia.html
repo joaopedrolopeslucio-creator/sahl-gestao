@@ -501,16 +501,40 @@ async function loadGest(refresh) {
 
 function renderCardsGest() {
   var d = _dadosG;
-  var tA = d.ativos.reduce(function(s,x){return s+x.total;},0);
   var tF = d.fantasmas.reduce(function(s,x){return s+x.total;},0);
-  var acum = d.ativos.filter(function(a){return a.meses.length>1;}).length;
-  var criticos = d.ativos.filter(function(a){ return calcDiasAtraso(a.cobras) >= 30; }).length;
+
+  var tiers = { critico:{v:0,n:0}, alto:{v:0,n:0}, medio:{v:0,n:0}, baixo:{v:0,n:0} };
+  d.ativos.forEach(function(a){
+    var nivel = nivelCriticidade(calcDiasAtraso(a.cobras));
+    tiers[nivel].v += a.total;
+    tiers[nivel].n++;
+  });
+  var total = d.ativos.reduce(function(s,x){return s+x.total;},0);
+
   document.getElementById('cards').innerHTML =
-    card('warn',   d.ativos.length,                'Inadimplentes ativos',  'Alunos Active no EVO com cobrança vencida') +
-    card('danger', criticos,                       'Críticos (30+ dias)',   'Exigem contato imediato') +
-    card('danger', 'R$\u00A0'+fmt(tA+tF),          'Total em aberto',       'Ativos R$\u00A0'+fmt(tA)+' + Fantasmas R$\u00A0'+fmt(tF)) +
-    card('warn',   acum,                           'Dívida acumulada',      'Inadimplentes com 2+ meses em atraso');
+    '<div class="card danger" style="border-color:#7f1d1d">' +
+      '<div class="card-label">Crítico · 30+ dias</div>' +
+      '<div class="card-value">R$\u00A0'+fmt(tiers.critico.v)+'</div>' +
+      '<div class="card-sub">'+tiers.critico.n+' inadimplentes · '+pct(tiers.critico.v,total)+'% do total</div>' +
+    '</div>' +
+    '<div class="card" style="border-color:#7c2d12">' +
+      '<div class="card-label">Alto · 16–30 dias</div>' +
+      '<div class="card-value" style="color:#f97316">R$\u00A0'+fmt(tiers.alto.v)+'</div>' +
+      '<div class="card-sub">'+tiers.alto.n+' inadimplentes · '+pct(tiers.alto.v,total)+'% do total</div>' +
+    '</div>' +
+    '<div class="card warn">' +
+      '<div class="card-label">Médio · 8–15 dias</div>' +
+      '<div class="card-value">R$\u00A0'+fmt(tiers.medio.v)+'</div>' +
+      '<div class="card-sub">'+tiers.medio.n+' inadimplentes · '+pct(tiers.medio.v,total)+'% do total</div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-label">Baixo · até 7 dias</div>' +
+      '<div class="card-value" style="color:#64748b">R$\u00A0'+fmt(tiers.baixo.v)+'</div>' +
+      '<div class="card-sub">'+tiers.baixo.n+' inadimplentes · '+pct(tiers.baixo.v,total)+'% do total</div>' +
+    '</div>';
 }
+
+function pct(v, total) { return total > 0 ? Math.round(v/total*100) : 0; }
 
 function calcDiasAtraso(cobras) {
   if (!cobras || !cobras.length) return 0;
