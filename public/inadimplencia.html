@@ -228,9 +228,9 @@
           <button class="status-btn novo"       data-s="NOVO"       onclick="setStatus('NOVO')">Novo</button>
           <button class="status-btn em_contato" data-s="EM_CONTATO" onclick="setStatus('EM_CONTATO')">Em contato</button>
           <button class="status-btn aguardando" data-s="AGUARDANDO" onclick="setStatus('AGUARDANDO')">Aguardando</button>
-          <button class="status-btn recuperado" data-s="RECUPERADO" onclick="setStatus('RECUPERADO')">Recuperado</button>
           <button class="status-btn perdido"    data-s="PERDIDO"    onclick="setStatus('PERDIDO')">Perdido</button>
         </div>
+        <div style="font-size:11px;color:#334155;margin-top:6px">✦ Recuperado é confirmado automaticamente via Asaas</div>
       </div>
       <div>
         <div class="section-label">Observação</div>
@@ -260,7 +260,6 @@
               <option value="AGUARDANDO">Aguardando resposta</option>
               <option value="PROMETEU">Prometeu pagar</option>
               <option value="RECUSOU">Recusou pagar</option>
-              <option value="PAGO">Pagou ✓</option>
             </select>
           </div>
         </div>
@@ -722,10 +721,7 @@ async function registrarAcao() {
   document.getElementById('m-notas').value='';
   if (_dadosG) {
     var item=_dadosG.ativos.find(function(a){return a.cpf===_modalCpf;});
-    if (item) {
-      item.ultimaAcao={tipo,resultado,data:new Date().toISOString(),notas};
-      if (resultado==='PAGO') { item.statusGestao='RECUPERADO'; updateStatusBtns('RECUPERADO'); }
-    }
+    if (item) item.ultimaAcao={tipo,resultado,data:new Date().toISOString(),notas};
     renderTabelaGest();
   }
   await loadHistory(_modalCpf);

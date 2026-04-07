@@ -456,6 +456,24 @@ app.get('/api/inadimplencia/gestao', async (req, res) => {
     }
     syncToDb(_inadCache.ativos);
 
+    // Auto-recuperação: quem saiu da lista OVERDUE do Asaas foi baixado
+    const overdueAgora = new Set([
+      ..._inadCache.ativos.map(a => a.cpf),
+      ..._inadCache.fantasmas.map(a => a.cpf),
+      ...(_inadCache.naoEncontrados || []).map(a => a.cpf),
+    ].filter(Boolean));
+    const pendentesDb = db.prepare(
+      `SELECT cpf FROM gestao_clientes WHERE status_gestao NOT IN ('RECUPERADO','PERDIDO')`
+    ).all();
+    const nowAuto = new Date().toISOString();
+    for (const row of pendentesDb) {
+      if (row.cpf && !overdueAgora.has(row.cpf)) {
+        db.prepare(
+          `UPDATE gestao_clientes SET status_gestao='RECUPERADO', data_resolucao=? WHERE cpf=?`
+        ).run(nowAuto, row.cpf);
+      }
+    }
+
     const dbMap = Object.fromEntries(
       db.prepare('SELECT * FROM gestao_clientes').all().map(r => [r.cpf, r])
     );
