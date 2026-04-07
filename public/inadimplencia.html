@@ -110,6 +110,9 @@
   .nome-cell small{display:block;font-size:10.5px;color:#475569;margin-top:1px}
   .link-fatura{display:inline-flex;align-items:center;gap:3px;color:#6366f1;font-size:11px;text-decoration:none;padding:2px 8px;border:1px solid #2d2f60;border-radius:4px;transition:all .15s}
   .link-fatura:hover{background:#1e1f4a;color:#a5b4fc}
+  .btn-copy{background:none;border:1px solid #1e293b;color:#475569;border-radius:4px;padding:2px 7px;font-size:12px;cursor:pointer;transition:all .15s;line-height:1}
+  .btn-copy:hover{border-color:#334155;color:#94a3b8}
+  .btn-copy.copied{border-color:#166534;color:#22c55e}
   .ult-acao{font-size:10.5px;color:#475569}
   .ult-acao strong{color:#64748b}
   .btn-acao{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);color:#818cf8;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
@@ -421,7 +424,9 @@ function renderTabelaRec() {
   if (!rows.length) { document.getElementById('tabela-wrap').innerHTML='<div class="empty">Nenhuma cobrança encontrada.</div>'; return; }
   var html='<table><thead><tr><th>#</th><th>Cliente</th><th>Descrição</th><th>Valor</th><th>Status</th><th>Fatura</th></tr></thead><tbody>';
   rows.forEach(function(r,i){
-    var fatura = r.linkFatura ? '<a class="link-fatura" href="'+esc(r.linkFatura)+'" target="_blank">Ver ↗</a>' : '—';
+    var fatura = r.linkFatura
+      ? '<a class="link-fatura" href="'+esc(r.linkFatura)+'" target="_blank">Ver ↗</a> <button class="btn-copy" title="Copiar link" onclick="copyLink(this,\''+esc(r.linkFatura)+'\')">⎘</button>'
+      : '—';
     html+='<tr>'+
       '<td class="cobr-count">'+(i+1)+'</td>'+
       '<td class="nome-cell">'+esc(r.nome)+'<small>'+fmtCpf(r.cpf)+'</small></td>'+
@@ -706,6 +711,13 @@ function fmt(v){ return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:
 function fmtCpf(c){ if(!c||c.length<11) return c||''; return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'); }
 function fmtDateISO(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
 function card(cls, val, label, sub){ return '<div class="card '+cls+'"><div class="card-label">'+label+'</div><div class="card-value">'+val+'</div><div class="card-sub">'+sub+'</div></div>'; }
+function copyLink(btn, url) {
+  navigator.clipboard.writeText(url).then(function() {
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(function(){ btn.classList.remove('copied'); btn.textContent = '⎘'; }, 1800);
+  });
+}
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
