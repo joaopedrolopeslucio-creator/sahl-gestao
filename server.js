@@ -332,8 +332,8 @@ async function buildInadimplencia(evoMembers) {
     await Promise.all(batch.map(async id => {
       try {
         const c = await asaasGetCustomer(id);
-        customerMap[id] = { nome: c.name || '', cpf: (c.cpfCnpj || '').replace(/\D/g, '') };
-      } catch(e) { customerMap[id] = { nome: '', cpf: '' }; }
+        customerMap[id] = { nome: c.name || '', cpf: (c.cpfCnpj || '').replace(/\D/g, ''), telefone: (c.mobilePhone || c.phone || '').replace(/\D/g, '') };
+      } catch(e) { customerMap[id] = { nome: '', cpf: '', telefone: '' }; }
     }));
   }
 
@@ -344,7 +344,7 @@ async function buildInadimplencia(evoMembers) {
     const cpf = cust.cpf || '';
     const nome = cust.nome || custId;
     const key = cpf || custId;
-    if (!byCpf[key]) byCpf[key] = { nome, cpf, cobras: [], total: 0 };
+    if (!byCpf[key]) byCpf[key] = { nome, cpf, telefone: cust.telefone || '', cobras: [], total: 0 };
     for (const p of pmts) {
       byCpf[key].cobras.push({ valor: p.value, venc: p.dueDate, plano: p.description || '', link: p.invoiceUrl || '' });
       byCpf[key].total += p.value;

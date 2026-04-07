@@ -118,6 +118,8 @@
   .btn-copy{background:none;border:1px solid #1e293b;color:#475569;border-radius:4px;padding:2px 7px;font-size:12px;cursor:pointer;transition:all .15s;line-height:1}
   .btn-copy:hover{border-color:#334155;color:#94a3b8}
   .btn-copy.copied{border-color:#166534;color:#22c55e}
+  .telefone{font-size:11px;color:#475569;white-space:nowrap}
+  .fatura-line{display:flex;align-items:center;gap:4px;line-height:2}
   .ult-acao{font-size:10.5px;color:#475569}
   .ult-acao strong{color:#64748b}
   .btn-acao{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);color:#818cf8;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
@@ -590,10 +592,12 @@ function renderTabelaGest() {
   var isAtivo    = _mainTab === 'ativos';
 
   var html='<table><thead><tr>'+
-    '<th>#</th><th>Nome</th><th>CPF</th>'+
+    '<th>#</th><th>Nome</th>'+
+    (isAtivo?'<th>Contato</th>':'')+
+    '<th>CPF</th>'+
     (isFantasma?'<th>Status EVO</th>':'')+
     (isAtivo?'<th>Atraso</th>':'')+
-    '<th>Vencimento(s)</th><th>Cobr.</th><th>Total</th>'+
+    '<th>'+(isAtivo?'Vencimento / Fatura':'Vencimento(s)')+'</th><th>Cobr.</th><th>Total</th>'+
     (isAtivo?'<th>Gestão</th><th>Última ação</th><th></th>':'')+
     '</tr></thead><tbody>';
 
@@ -609,8 +613,17 @@ function renderTabelaGest() {
       var sl=r.evoStatus==='Suspended'?'Suspenso':'Inativo';
       evoCol='<td><span class="badge '+sc+'">'+sl+'</span></td>';
     }
-    var datas=(r.cobras||[]).map(function(c){return c.venc;}).sort()
-      .map(function(v){var p=v.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);}).join('<br>');
+    var cobrasSorted=(r.cobras||[]).slice().sort(function(a,b){return a.venc>b.venc?1:-1;});
+    var datas = isAtivo
+      ? cobrasSorted.map(function(c){
+          var p=c.venc.split('-');
+          var dataFmt=p[2]+'/'+p[1]+'/'+p[0].slice(2);
+          var copyBtn=c.link
+            ? ' <button class="btn-copy" title="Copiar link da fatura" onclick="copyLink(this,\''+esc(c.link)+'\')">⎘</button>'
+            : '';
+          return '<div class="fatura-line"><span class="meses">'+dataFmt+'</span>'+copyBtn+'</div>';
+        }).join('')
+      : cobrasSorted.map(function(c){var p=c.venc.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);}).join('<br>');
     var diasCol='';
     if (isAtivo) {
       diasCol='<td><span class="dias-badge dias-'+r._nivel+'">'+r._dias+'d · '+NIVEL_LABEL[r._nivel]+'</span></td>';
@@ -634,9 +647,13 @@ function renderTabelaGest() {
           ' data-obs="'+esc(r.observacao||'')+'"'+
           ' onclick="openModal(this)">Ações</button></td>';
     }
+    var telefoneCol = isAtivo
+      ? '<td class="telefone">'+fmtTel(r.telefone||'')+'</td>'
+      : '';
     html+='<tr'+rowCls+'>'+
       '<td class="cobr-count">'+(i+1)+'</td>'+
       '<td>'+esc(r.nome)+' '+tag+'</td>'+
+      telefoneCol+
       '<td class="meses">'+r.cpf+'</td>'+
       evoCol+
       diasCol+
@@ -817,6 +834,7 @@ function renderTabelaRecuperados() {
 // ─────────────────────────────────────────────────────────────────────────────
 function fmt(v){ return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
 function fmtCpf(c){ if(!c||c.length<11) return c||''; return c.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,'$1.$2.$3-$4'); }
+function fmtTel(t){ if(!t) return '—'; t=t.replace(/\D/g,''); if(t.length===11) return '('+t.slice(0,2)+') '+t.slice(2,7)+'-'+t.slice(7); if(t.length===10) return '('+t.slice(0,2)+') '+t.slice(2,6)+'-'+t.slice(6); return t; }
 function fmtDateISO(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
 function card(cls, val, label, sub){ return '<div class="card '+cls+'"><div class="card-label">'+label+'</div><div class="card-value">'+val+'</div><div class="card-sub">'+sub+'</div></div>'; }
 function copyLink(btn, url) {
