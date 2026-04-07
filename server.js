@@ -132,6 +132,112 @@ const ASAAS_KEY = '$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmZ
 let _inadCache = null;
 let _inadCacheTs = 0;
 
+// ─── Customer name cache (shared) ─────────────────────────────────────────────
+const _custCache = {};
+async function asaasGetCustomerCached(id) {
+  if (_custCache[id]) return _custCache[id];
+  try {
+    const c = await asaasGetCustomer(id);
+    _custCache[id] = { nome: c.name || '', cpf: (c.cpfCnpj || '').replace(/\D/g, '') };
+  } catch { _custCache[id] = { nome: '', cpf: '' }; }
+  return _custCache[id];
+}
+
+// ─── SQLite — gestão de inadimplentes ─────────────────────────────────────────
+const Database = require('../waha-dashboard/node_modules/better-sqlite3');
+const db = new Database(path.join(__dirname, 'gestao.db'));
+db.exec(`
+  CREATE TABLE IF NOT EXISTS gestao_clientes (
+    cpf TEXT PRIMARY KEY,
+    nome TEXT,
+    status_gestao TEXT DEFAULT 'EM_COBRANCA',
+    data_entrada TEXT,
+    data_ultima_acao TEXT,
+    data_resolucao TEXT,
+    observacao TEXT
+  );
+  CREATE TABLE IF NOT EXISTS acoes_inadimplencia (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    cpf TEXT,
+    tipo TEXT,
+    resultado TEXT,
+    notas TEXT,
+    data_acao TEXT,
+    responsavel TEXT
+  );
+`);
+
+// ─── Recebíveis do dia ────────────────────────────────────────────────────────
+let _recebCache = {};
+let _recebCacheTs = {};
+const RECEBIVEIS_TTL = 15 * 60 * 1000;
+
+const STATUS_LABEL = { RECEIVED: 'PAGO', CONFIRMED: 'PAGO', OVERDUE: 'VENCIDO', PENDING: 'PENDENTE', REFUNDED: 'ESTORNADO' };
+
+async function asaasGetByDate(dateStr) {
+  const headers = { 'access_token': ASAAS_KEY };
+  let payments = [], offset = 0;
+  while (true) {
+    const r = await httpsGet('api.asaas.com',
+      `/v3/payments?dueDate%5Bge%5D=${dateStr}&dueDate%5Ble%5D=${dateStr}&limit=100&offset=${offset}`, headers);
+    if (!r.data || !r.data.length) break;
+    payments = payments.concat(r.data);
+    if (!r.hasMore) break;
+    offset += 100;
+  }
+  return payments;
+}
+
+async function buildRecebiveis(dateStr) {
+  const raw = await asaasGetByDate(dateStr);
+  const mens = raw.filter(p => {
+    const d = (p.description || '').toLowerCase();
+    return !d.startsWith('reserva de') && !d.startsWith('parcela');
+  });
+  const ids = [...new Set(mens.map(p => p.customer))];
+  for (let i = 0; i < ids.length; i += 10)
+    await Promise.all(ids.slice(i, i + 10).map(id => asaasGetCustomerCached(id)));
+
+  const list = mens.map(p => {
+    const cust = _custCache[p.customer] || {};
+    return {
+      id: p.id,
+      nome: cust.nome || '',
+      cpf: cust.cpf || '',
+      valor: p.value,
+      vencimento: p.dueDate,
+      status: STATUS_LABEL[p.status] || p.status,
+      statusRaw: p.status,
+      descricao: p.description || '',
+      linkFatura: p.invoiceUrl || '',
+      dataPagamento: p.paymentDate || null,
+    };
+  });
+
+  const order = { VENCIDO: 0, PENDENTE: 1, PAGO: 2, ESTORNADO: 3 };
+  list.sort((a, b) => (order[a.status] ?? 9) - (order[b.status] ?? 9));
+
+  const esperado  = list.reduce((s, p) => s + p.valor, 0);
+  const recebido  = list.filter(p => p.status === 'PAGO').reduce((s, p) => s + p.valor, 0);
+  const vencido   = list.filter(p => p.status === 'VENCIDO').reduce((s, p) => s + p.valor, 0);
+  const pendente  = list.filter(p => p.status === 'PENDENTE').reduce((s, p) => s + p.valor, 0);
+
+  return {
+    data: dateStr,
+    resumo: {
+      esperado, recebido, vencido, pendente,
+      countTotal:    list.length,
+      countPago:     list.filter(p => p.status === 'PAGO').length,
+      countVencido:  list.filter(p => p.status === 'VENCIDO').length,
+      countPendente: list.filter(p => p.status === 'PENDENTE').length,
+      taxaRecuperacao:   esperado > 0 ? (recebido  / esperado * 100) : 0,
+      taxaInadimplencia: esperado > 0 ? (vencido   / esperado * 100) : 0,
+    },
+    cobrancas: list,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 function httpsGet(hostname, path, headers) {
   return new Promise((resolve, reject) => {
     https.get({ hostname, path, headers }, r => {
@@ -296,6 +402,126 @@ app.get('/api/inadimplencia/csv-ativos', (req, res) => {
 
 app.get('/inadimplencia', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'inadimplencia.html'));
+});
+
+// ─── Recebíveis ───────────────────────────────────────────────────────────────
+app.get('/api/recebiveis', async (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const dateStr = req.query.data || today;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return res.status(400).json({ error: 'Data inválida. Use YYYY-MM-DD.' });
+  const forceRefresh = req.query.refresh === '1';
+  const age = Date.now() - (_recebCacheTs[dateStr] || 0);
+  if (_recebCache[dateStr] && age < RECEBIVEIS_TTL && !forceRefresh) return res.json(_recebCache[dateStr]);
+  try {
+    _recebCache[dateStr] = await buildRecebiveis(dateStr);
+    _recebCacheTs[dateStr] = Date.now();
+    res.json(_recebCache[dateStr]);
+  } catch(e) {
+    console.error('[RECEBIVEIS]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.get('/recebiveis', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'recebiveis.html'));
+});
+
+// ─── Gestão de inadimplentes (SQLite) ────────────────────────────────────────
+function syncToDb(list) {
+  const stmt = db.prepare(`INSERT OR IGNORE INTO gestao_clientes (cpf,nome,status_gestao,data_entrada) VALUES (?,?,'EM_COBRANCA',?)`);
+  const now = new Date().toISOString();
+  for (const a of list) if (a.cpf) stmt.run(a.cpf, a.nome, now);
+}
+
+app.get('/api/inadimplencia/gestao', async (req, res) => {
+  const forceRefresh = req.query.refresh === '1';
+  const age = Date.now() - _inadCacheTs;
+  try {
+    if (!_inadCache || age > 30 * 60 * 1000 || forceRefresh) {
+      const evo = await evoGetAll();
+      _inadCache = await buildInadimplencia(evo);
+      _inadCacheTs = Date.now();
+    }
+    syncToDb(_inadCache.ativos);
+
+    const dbMap = Object.fromEntries(
+      db.prepare('SELECT * FROM gestao_clientes').all().map(r => [r.cpf, r])
+    );
+    const acoesMap = Object.fromEntries(
+      db.prepare(`
+        SELECT a.* FROM acoes_inadimplencia a
+        INNER JOIN (SELECT cpf, MAX(id) as mid FROM acoes_inadimplencia GROUP BY cpf) m
+        ON a.cpf=m.cpf AND a.id=m.mid
+      `).all().map(a => [a.cpf, a])
+    );
+
+    const enrich = list => list.map(item => {
+      const g = dbMap[item.cpf] || {};
+      const ua = acoesMap[item.cpf] || null;
+      return {
+        ...item,
+        statusGestao:   g.status_gestao || 'EM_COBRANCA',
+        dataEntrada:    g.data_entrada  || null,
+        dataResolucao:  g.data_resolucao || null,
+        observacao:     g.observacao    || '',
+        ultimaAcao: ua ? { tipo: ua.tipo, resultado: ua.resultado, data: ua.data_acao, notas: ua.notas } : null,
+      };
+    });
+
+    res.json({
+      ..._inadCache,
+      ativos:          enrich(_inadCache.ativos),
+      fantasmas:       enrich(_inadCache.fantasmas),
+      naoEncontrados:  enrich(_inadCache.naoEncontrados || []),
+    });
+  } catch(e) {
+    console.error('[GESTAO INAD]', e.message);
+    res.status(500).json({ error: e.message });
+  }
+});
+
+app.patch('/api/inadimplencia/gestao/:cpf', (req, res) => {
+  const { cpf } = req.params;
+  const { status_gestao, observacao, nome } = req.body;
+  const now = new Date().toISOString();
+  const exists = db.prepare('SELECT cpf FROM gestao_clientes WHERE cpf=?').get(cpf);
+  if (!exists) {
+    db.prepare(`INSERT INTO gestao_clientes (cpf,nome,status_gestao,data_entrada,observacao) VALUES (?,?,?,?,?)`)
+      .run(cpf, nome || '', status_gestao || 'EM_COBRANCA', now, observacao || '');
+  } else {
+    const fields = [], vals = [];
+    if (status_gestao !== undefined) {
+      fields.push('status_gestao=?'); vals.push(status_gestao);
+      if (status_gestao === 'RECUPERADO' || status_gestao === 'PERDIDO') {
+        fields.push('data_resolucao=?'); vals.push(now);
+      }
+    }
+    if (observacao !== undefined) { fields.push('observacao=?'); vals.push(observacao); }
+    if (fields.length) db.prepare(`UPDATE gestao_clientes SET ${fields.join(',')} WHERE cpf=?`).run(...vals, cpf);
+  }
+  res.json({ ok: true });
+});
+
+app.post('/api/inadimplencia/gestao/:cpf/acao', (req, res) => {
+  const { cpf } = req.params;
+  const { tipo, resultado, notas, nome } = req.body;
+  const now = new Date().toISOString();
+  const exists = db.prepare('SELECT cpf FROM gestao_clientes WHERE cpf=?').get(cpf);
+  if (!exists)
+    db.prepare(`INSERT INTO gestao_clientes (cpf,nome,status_gestao,data_entrada) VALUES (?,?,'EM_COBRANCA',?)`)
+      .run(cpf, nome || '', now);
+  db.prepare(`INSERT INTO acoes_inadimplencia (cpf,tipo,resultado,notas,data_acao,responsavel) VALUES (?,?,?,?,?,?)`)
+    .run(cpf, tipo || 'OUTRO', resultado || 'SEM_RESPOSTA', notas || '', now, 'admin');
+  db.prepare(`UPDATE gestao_clientes SET data_ultima_acao=? WHERE cpf=?`).run(now, cpf);
+  if (resultado === 'PAGO')
+    db.prepare(`UPDATE gestao_clientes SET status_gestao='RECUPERADO', data_resolucao=? WHERE cpf=?`).run(now, cpf);
+  res.json({ ok: true });
+});
+
+app.get('/api/inadimplencia/gestao/:cpf/acoes', (req, res) => {
+  const acoes = db.prepare(`SELECT * FROM acoes_inadimplencia WHERE cpf=? ORDER BY data_acao DESC LIMIT 50`)
+    .all(req.params.cpf);
+  res.json(acoes);
 });
 
 // ─── Cobrança Avulsa ──────────────────────────────────────────────────────────

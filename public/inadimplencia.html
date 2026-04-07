@@ -21,14 +21,14 @@
 
   .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
   .tabs{display:flex;gap:2px;background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:3px}
-  .tab{padding:6px 16px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s}
+  .tab{padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:none;background:none;color:#64748b;transition:all .15s;white-space:nowrap}
   .tab.active{background:#1e293b;color:#e2e8f0}
-  .search{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px;color:#e2e8f0;outline:none;width:220px}
+  .search{background:#1e293b;border:1px solid #334155;border-radius:8px;padding:6px 12px;font-size:12px;color:#e2e8f0;outline:none;width:200px}
   .search:focus{border-color:#6366f1}
+  select.search{width:160px;cursor:pointer}
   .btn{padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s}
   .btn:hover{opacity:.85}
   .btn-green{background:#166534;color:#bbf7d0}
-  .btn-blue{background:#1e3a5f;color:#93c5fd}
   .btn-gray{background:#1e293b;border:1px solid #334155;color:#94a3b8}
   .ml-auto{margin-left:auto}
   .upd{font-size:11px;color:#334155}
@@ -40,6 +40,10 @@
   .badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600}
   .badge-inactive{background:#3f1a1a;color:#fca5a5}
   .badge-suspended{background:#3f2a00;color:#fcd34d}
+  .badge-em_cobranca{background:#451a03;color:#fcd34d}
+  .badge-aguardando{background:#0c1a4a;color:#93c5fd}
+  .badge-recuperado{background:#14532d;color:#86efac}
+  .badge-perdido{background:#1e293b;color:#475569}
   .meses{color:#94a3b8;font-size:11px}
   .valor{font-weight:700;color:#e2e8f0}
   .cobr-count{color:#64748b;font-size:11px}
@@ -47,6 +51,62 @@
   .loading{text-align:center;padding:60px;color:#475569}
   .tag-acum{background:#3b1a00;color:#fb923c;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:600}
   .tag-mar{background:#1a2d1a;color:#86efac;border-radius:4px;font-size:10px;padding:1px 6px;font-weight:600}
+  .ult-acao{font-size:10.5px;color:#475569}
+  .ult-acao strong{color:#64748b}
+  .btn-acao{background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.2);color:#818cf8;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+  .btn-acao:hover{background:rgba(99,102,241,.22);color:#a5b4fc}
+
+  /* Modal */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:center;justify-content:center;backdrop-filter:blur(4px);padding:20px}
+  .modal-backdrop.open{display:flex}
+  .modal-box{background:#0f1220;border:1px solid #1e293b;border-radius:14px;width:100%;max-width:520px;display:flex;flex-direction:column;max-height:90vh;overflow:hidden}
+  .modal-header{display:flex;align-items:flex-start;gap:12px;padding:20px 20px 16px;border-bottom:1px solid #1a1f35}
+  .modal-header-info{flex:1;min-width:0}
+  .modal-title{font-size:15px;font-weight:700;color:#e2e8f0;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .modal-meta{font-size:11px;color:#475569}
+  .modal-close{background:none;border:none;color:#3d4466;font-size:18px;cursor:pointer;padding:2px 6px;border-radius:5px;transition:all .15s;flex-shrink:0}
+  .modal-close:hover{background:#1a1f35;color:#94a3b8}
+  .modal-body{padding:18px 20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+
+  /* Status selector */
+  .status-group{display:flex;gap:6px;flex-wrap:wrap}
+  .status-btn{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid transparent;transition:all .15s;opacity:.5}
+  .status-btn:hover{opacity:.8}
+  .status-btn.active{opacity:1}
+  .status-btn.em_cobranca{background:#451a03;color:#fcd34d;border-color:#78350f}
+  .status-btn.aguardando{background:#0c1a4a;color:#93c5fd;border-color:#1e3a7a}
+  .status-btn.recuperado{background:#14532d;color:#86efac;border-color:#166534}
+  .status-btn.perdido{background:#1a1f2e;color:#475569;border-color:#2a3050}
+
+  /* Action form */
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .form-group{display:flex;flex-direction:column;gap:5px}
+  .form-label{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em}
+  .form-select,.form-textarea{background:#090b12;border:1px solid #1a1f35;color:#e2e8f0;border-radius:7px;padding:8px 10px;font-size:12.5px;outline:none;font-family:inherit;transition:border-color .15s}
+  .form-select:focus,.form-textarea:focus{border-color:#6366f1}
+  .form-textarea{resize:vertical;min-height:60px}
+  .btn-registrar{align-self:flex-end;background:#6366f1;border:none;color:#fff;border-radius:8px;padding:8px 20px;font-size:12.5px;font-weight:600;cursor:pointer;transition:opacity .15s}
+  .btn-registrar:hover{opacity:.85}
+
+  /* History */
+  .history-section{border-top:1px solid #1a1f35;padding-top:14px}
+  .history-title{font-size:11px;font-weight:700;color:#3d4466;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+  .history-item{display:flex;gap:10px;padding:8px 0;border-bottom:1px solid #0f172a}
+  .history-item:last-child{border-bottom:none}
+  .history-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+  .history-info{flex:1;min-width:0}
+  .history-main{font-size:12px;color:#94a3b8;margin-bottom:2px}
+  .history-main strong{color:#e2e8f0}
+  .history-notas{font-size:11px;color:#475569;margin-top:2px}
+  .history-date{font-size:10.5px;color:#334155;white-space:nowrap}
+  .history-empty{font-size:12px;color:#334155;text-align:center;padding:16px 0}
+
+  .section-label{font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+  .obs-row{display:flex;gap:8px}
+  .obs-input{flex:1;background:#090b12;border:1px solid #1a1f35;color:#e2e8f0;border-radius:7px;padding:7px 10px;font-size:12.5px;outline:none;font-family:inherit}
+  .obs-input:focus{border-color:#6366f1}
+  .btn-salvar-obs{background:#1e293b;border:1px solid #334155;color:#94a3b8;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+  .btn-salvar-obs:hover{color:#e2e8f0}
 </style>
 </head>
 <body>
@@ -60,9 +120,17 @@
 <div class="toolbar">
   <div class="tabs">
     <button class="tab active" onclick="setTab('ativos',this)">Inadimplentes Ativos <span id="cnt-ativos"></span></button>
-    <button class="tab" onclick="setTab('fantasmas',this)">Fantasmas (cancelados no EVO) <span id="cnt-fantasmas"></span></button>
+    <button class="tab" onclick="setTab('fantasmas',this)">Fantasmas <span id="cnt-fantasmas"></span></button>
+    <button class="tab" onclick="setTab('naoEnc',this)">Não encontrados <span id="cnt-naoenc"></span></button>
   </div>
   <input class="search" id="search" type="text" placeholder="Buscar por nome ou CPF..." oninput="renderTabela()">
+  <select class="search" id="filter-status" onchange="renderTabela()">
+    <option value="">Todos os status</option>
+    <option value="EM_COBRANCA">Em cobrança</option>
+    <option value="AGUARDANDO">Aguardando</option>
+    <option value="RECUPERADO">Recuperado</option>
+    <option value="PERDIDO">Perdido</option>
+  </select>
   <button class="btn btn-green ml-auto" id="btn-csv" onclick="downloadCsv()">⬇ Exportar CSV</button>
   <button class="btn btn-gray" onclick="atualizar()">↻ Atualizar</button>
   <span class="upd" id="upd"></span>
@@ -72,62 +140,160 @@
   <div class="loading">Carregando dados do EVO e Asaas...</div>
 </div>
 
+<!-- ── Modal de gestão ── -->
+<div class="modal-backdrop" id="modal" onclick="onBackdropClick(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-info">
+        <div class="modal-title" id="m-nome">—</div>
+        <div class="modal-meta" id="m-meta">—</div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Status -->
+      <div>
+        <div class="section-label">Status da gestão</div>
+        <div class="status-group">
+          <button class="status-btn em_cobranca" data-s="EM_COBRANCA" onclick="setStatus('EM_COBRANCA')">Em cobrança</button>
+          <button class="status-btn aguardando"  data-s="AGUARDANDO"  onclick="setStatus('AGUARDANDO')">Aguardando</button>
+          <button class="status-btn recuperado"  data-s="RECUPERADO"  onclick="setStatus('RECUPERADO')">Recuperado</button>
+          <button class="status-btn perdido"     data-s="PERDIDO"     onclick="setStatus('PERDIDO')">Perdido</button>
+        </div>
+      </div>
+
+      <!-- Observação -->
+      <div>
+        <div class="section-label">Observação</div>
+        <div class="obs-row">
+          <input class="obs-input" id="m-obs" type="text" placeholder="Anotação sobre este inadimplente...">
+          <button class="btn-salvar-obs" onclick="salvarObs()">Salvar</button>
+        </div>
+      </div>
+
+      <!-- Registrar ação -->
+      <div>
+        <div class="section-label">Registrar ação</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select class="form-select" id="m-tipo">
+              <option value="WHATSAPP">WhatsApp</option>
+              <option value="LIGACAO">Ligação</option>
+              <option value="EMAIL">E-mail</option>
+              <option value="REENVIO">Reenvio de cobrança</option>
+              <option value="TROCA_CARTAO">Troca de cartão</option>
+              <option value="OUTRO">Outro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resultado</label>
+            <select class="form-select" id="m-resultado">
+              <option value="SEM_RESPOSTA">Sem resposta</option>
+              <option value="AGUARDANDO">Aguardando resposta</option>
+              <option value="PROMETEU">Prometeu pagar</option>
+              <option value="RECUSOU">Recusou pagar</option>
+              <option value="PAGO">Pagou ✓</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:10px">
+          <label class="form-label">Notas</label>
+          <textarea class="form-textarea" id="m-notas" placeholder="Detalhes da conversa, promessa de data, etc..."></textarea>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-top:10px">
+          <button class="btn-registrar" onclick="registrarAcao()">Registrar ação</button>
+        </div>
+      </div>
+
+      <!-- Histórico -->
+      <div class="history-section">
+        <div class="history-title">Histórico de ações</div>
+        <div id="m-history"><div class="history-empty">Sem ações registradas.</div></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
 <script>
 var _dados = null;
 var _aba = 'ativos';
+var _modalCpf = null;
+var _modalNome = null;
 
+var TIPO_LABEL    = { WHATSAPP:'WhatsApp', LIGACAO:'Ligação', EMAIL:'E-mail', REENVIO:'Reenvio', TROCA_CARTAO:'Troca cartão', OUTRO:'Outro' };
+var RESULT_LABEL  = { SEM_RESPOSTA:'Sem resposta', AGUARDANDO:'Aguardando', PROMETEU:'Prometeu pagar', RECUSOU:'Recusou', PAGO:'Pagou' };
+var STATUS_LABEL  = { EM_COBRANCA:'Em cobrança', AGUARDANDO:'Aguardando', RECUPERADO:'Recuperado', PERDIDO:'Perdido' };
+var RESULT_COLORS = { SEM_RESPOSTA:'#475569', AGUARDANDO:'#60a5fa', PROMETEU:'#f59e0b', RECUSOU:'#ef4444', PAGO:'#22c55e' };
+
+// ── Load ──────────────────────────────────────────────────────────────────────
 async function carregar(refresh) {
-  document.getElementById('tabela-wrap').innerHTML = '<div class="loading">Buscando dados no Asaas e EVO' + (refresh ? ' (atualizando...)' : '') + ' — pode levar alguns segundos...</div>';
+  document.getElementById('tabela-wrap').innerHTML = '<div class="loading">Buscando dados no Asaas e EVO' + (refresh ? ' (atualizando...)' : '') + '...</div>';
   try {
-    var r = await fetch('/api/inadimplencia' + (refresh ? '?refresh=1' : ''));
+    var r = await fetch('/api/inadimplencia/gestao' + (refresh ? '?refresh=1' : ''));
     _dados = await r.json();
     renderCards();
     renderTabela();
     var dt = new Date(_dados.updatedAt);
     document.getElementById('upd').textContent = 'Atualizado às ' + dt.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   } catch(e) {
-    document.getElementById('tabela-wrap').innerHTML = '<div class="empty">Erro ao carregar: ' + e.message + '</div>';
+    document.getElementById('tabela-wrap').innerHTML = '<div class="empty">Erro ao carregar: ' + esc(e.message) + '</div>';
   }
 }
 
 function atualizar() { carregar(true); }
 
+// ── Cards ─────────────────────────────────────────────────────────────────────
 function renderCards() {
   var d = _dados;
   var totalAtivos = d.ativos.reduce(function(s,x){return s+x.total},0);
-  var totalFant = d.fantasmas.reduce(function(s,x){return s+x.total},0);
-  var total = totalAtivos + totalFant;
-  var acum = d.ativos.filter(function(a){return a.meses.length>1}).length;
+  var totalFant   = d.fantasmas.reduce(function(s,x){return s+x.total},0);
+  var total       = totalAtivos + totalFant;
+  var acum        = d.ativos.filter(function(a){return a.meses.length>1}).length;
+  var naoEnc      = (d.naoEncontrados||[]).length;
 
-  document.getElementById('cnt-ativos').textContent = '(' + d.ativos.length + ')';
-  document.getElementById('cnt-fantasmas').textContent = '(' + d.fantasmas.length + ')';
+  document.getElementById('cnt-ativos').textContent    = '('+d.ativos.length+')';
+  document.getElementById('cnt-fantasmas').textContent = '('+d.fantasmas.length+')';
+  document.getElementById('cnt-naoenc').textContent    = '('+naoEnc+')';
 
   document.getElementById('cards').innerHTML =
-    card('warn', d.ativos.length, 'Inadimplentes ativos', 'Alunos ativos no EVO com cobrança vencida') +
-    card('danger', d.fantasmas.length, 'Fantasmas no Asaas', 'Cancelados no EVO mas ainda sendo cobrados') +
-    card('danger', 'R$ ' + fmt(total), 'Total em aberto', 'Ativos R$ ' + fmt(totalAtivos) + ' + Fantasmas R$ ' + fmt(totalFant)) +
-    card('warn', acum, 'Com dívida acumulada', 'Ativos que devem 2+ meses');
+    card('warn',   d.ativos.length,       'Inadimplentes ativos',     'Alunos Active no EVO com cobrança vencida') +
+    card('danger', d.fantasmas.length,    'Fantasmas no Asaas',       'Cancelados no EVO mas ainda cobrados') +
+    card('danger', 'R$\u00A0'+fmt(total), 'Total em aberto',          'Ativos R$\u00A0'+fmt(totalAtivos)+' + Fantasmas R$\u00A0'+fmt(totalFant)) +
+    card('warn',   acum,                  'Com dívida acumulada',     'Ativos que devem 2+ meses');
 }
 
 function card(cls, val, label, sub) {
-  return '<div class="card ' + cls + '"><div class="card-label">' + label + '</div><div class="card-value">' + val + '</div><div class="card-sub">' + sub + '</div></div>';
+  return '<div class="card '+cls+'"><div class="card-label">'+label+'</div><div class="card-value">'+val+'</div><div class="card-sub">'+sub+'</div></div>';
 }
 
-function fmt(v) { return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
-
+// ── Tab / table ───────────────────────────────────────────────────────────────
 function setTab(aba, btn) {
   _aba = aba;
   document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
   btn.classList.add('active');
+  document.getElementById('filter-status').value = '';
   renderTabela();
 }
+
+function fmt(v){ return Number(v).toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+function fmtDate(s){ if(!s) return ''; var p=s.split('-'); return p[2]+'/'+p[1]+'/'+p[0].slice(2); }
+function fmtDateISO(iso){ if(!iso) return ''; var d=new Date(iso); return d.toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'})+' '+d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}); }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
 function renderTabela() {
   if (!_dados) return;
   var q = (document.getElementById('search').value || '').toLowerCase();
-  var rows = _aba === 'ativos' ? _dados.ativos : _dados.fantasmas;
+  var filterSt = document.getElementById('filter-status').value;
+  var srcMap = { ativos: _dados.ativos, fantasmas: _dados.fantasmas, naoEnc: _dados.naoEncontrados||[] };
+  var rows = srcMap[_aba] || [];
+
   rows = rows.filter(function(r) {
-    return !q || r.nome.toLowerCase().includes(q) || r.cpf.includes(q);
+    if (q && !r.nome.toLowerCase().includes(q) && !r.cpf.includes(q)) return false;
+    if (filterSt && r.statusGestao !== filterSt) return false;
+    return true;
   });
 
   if (!rows.length) {
@@ -135,38 +301,53 @@ function renderTabela() {
     return;
   }
 
-  var isFantasma = _aba === 'fantasmas';
+  var isFantasma   = _aba === 'fantasmas';
+  var isAtivo      = _aba === 'ativos';
+
   var html = '<table><thead><tr>' +
     '<th>#</th><th>Nome</th><th>CPF</th>' +
     (isFantasma ? '<th>Status EVO</th>' : '') +
     '<th>Vencimento(s)</th><th>Cobranças</th><th>Total</th>' +
+    (isAtivo ? '<th>Gestão</th><th>Última ação</th><th></th>' : '') +
     '</tr></thead><tbody>';
 
   rows.forEach(function(r, i) {
-    var acum = r.meses.length > 1;
+    var acum = r.meses && r.meses.length > 1;
     var tag = acum ? '<span class="tag-acum">acumulado</span>' : '<span class="tag-mar">só este mês</span>';
-    var statusBadge = '';
+    var statusEvoBadge = '';
     if (isFantasma) {
       var sc = r.evoStatus === 'Suspended' ? 'badge-suspended' : 'badge-inactive';
       var sl = r.evoStatus === 'Suspended' ? 'Suspenso' : 'Inativo';
-      statusBadge = '<td><span class="badge ' + sc + '">' + sl + '</span></td>';
+      statusEvoBadge = '<td><span class="badge '+sc+'">'+sl+'</span></td>';
     }
-    // Format each due date as dd/mm/yy
-    var vencDates = r.cobras
-      .map(function(c){ return c.venc; })
-      .sort()
-      .map(function(v){
-        var p = v.split('-');
-        return p[2] + '/' + p[1] + '/' + p[0].slice(2);
-      }).join('<br>');
+    var vencDates = (r.cobras||[]).map(function(c){return c.venc;}).sort()
+      .map(function(v){var p=v.split('-');return p[2]+'/'+p[1]+'/'+p[0].slice(2);}).join('<br>');
+
+    var gestaoCol = '';
+    if (isAtivo) {
+      var sg = (r.statusGestao||'EM_COBRANCA').toLowerCase().replace(/_/g, '_');
+      var sgLabel = STATUS_LABEL[r.statusGestao||'EM_COBRANCA'] || r.statusGestao;
+      var statusBadge = '<span class="badge badge-'+sg+'">'+sgLabel+'</span>';
+      var ultAcao = '';
+      if (r.ultimaAcao) {
+        var ua = r.ultimaAcao;
+        ultAcao = '<div class="ult-acao"><strong>'+(TIPO_LABEL[ua.tipo]||ua.tipo)+'</strong> · '+(RESULT_LABEL[ua.resultado]||ua.resultado)+'<br>'+fmtDateISO(ua.data)+'</div>';
+      } else {
+        ultAcao = '<span style="color:#334155;font-size:11px">—</span>';
+      }
+      gestaoCol = '<td>'+statusBadge+'</td><td>'+ultAcao+'</td>';
+      gestaoCol += '<td><button class="btn-acao" data-cpf="'+esc(r.cpf)+'" data-nome="'+esc(r.nome)+'" data-total="'+r.total+'" data-meses="'+esc((r.meses||[]).join(','))+'" data-status="'+esc(r.statusGestao||'EM_COBRANCA')+'" data-obs="'+esc(r.observacao||'')+'" onclick="openModal(this)">Ações</button></td>';
+    }
+
     html += '<tr>' +
-      '<td class="cobr-count">' + (i+1) + '</td>' +
-      '<td>' + esc(r.nome) + ' ' + tag + '</td>' +
-      '<td class="meses">' + r.cpf + '</td>' +
-      statusBadge +
-      '<td class="meses" style="line-height:1.7">' + vencDates + '</td>' +
-      '<td class="cobr-count">' + r.cobras.length + 'x</td>' +
-      '<td class="valor">R$ ' + r.total.toFixed(2).replace('.',',') + '</td>' +
+      '<td class="cobr-count">'+(i+1)+'</td>' +
+      '<td>'+esc(r.nome)+' '+tag+'</td>' +
+      '<td class="meses">'+r.cpf+'</td>' +
+      statusEvoBadge +
+      '<td class="meses" style="line-height:1.7">'+vencDates+'</td>' +
+      '<td class="cobr-count">'+(r.cobras||[]).length+'x</td>' +
+      '<td class="valor">R$\u00A0'+r.total.toFixed(2).replace('.',',')+'</td>' +
+      gestaoCol +
       '</tr>';
   });
 
@@ -174,12 +355,139 @@ function renderTabela() {
   document.getElementById('tabela-wrap').innerHTML = html;
 }
 
+// ── CSV ───────────────────────────────────────────────────────────────────────
 function downloadCsv() {
-  var url = _aba === 'ativos' ? '/api/inadimplencia/csv-ativos' : '/api/inadimplencia/csv-fantasmas';
-  window.open(url);
+  var map = { ativos: '/api/inadimplencia/csv-ativos', fantasmas: '/api/inadimplencia/csv-fantasmas', naoEnc: null };
+  var url = map[_aba];
+  if (url) window.open(url);
 }
 
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+// ── Modal ─────────────────────────────────────────────────────────────────────
+function openModal(btn) {
+  var cpf    = btn.getAttribute('data-cpf');
+  var nome   = btn.getAttribute('data-nome');
+  var total  = parseFloat(btn.getAttribute('data-total'));
+  var meses  = btn.getAttribute('data-meses').split(',').filter(Boolean);
+  var status = btn.getAttribute('data-status') || 'EM_COBRANCA';
+  var obs    = btn.getAttribute('data-obs') || '';
+
+  _modalCpf  = cpf;
+  _modalNome = nome;
+
+  document.getElementById('m-nome').textContent = nome;
+  document.getElementById('m-meta').textContent = 'R$\u00A0' + total.toFixed(2).replace('.',',') + ' em aberto · ' + meses.length + (meses.length === 1 ? ' mês' : ' meses');
+  document.getElementById('m-obs').value = obs;
+  updateStatusBtns(status);
+  document.getElementById('m-tipo').value = 'WHATSAPP';
+  document.getElementById('m-resultado').value = 'SEM_RESPOSTA';
+  document.getElementById('m-notas').value = '';
+  loadHistory(cpf);
+  document.getElementById('modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  _modalCpf = null;
+}
+
+function onBackdropClick(e) {
+  if (e.target === document.getElementById('modal')) closeModal();
+}
+
+function updateStatusBtns(current) {
+  document.querySelectorAll('.status-btn').forEach(function(b) {
+    b.classList.toggle('active', b.getAttribute('data-s') === current);
+  });
+}
+
+async function setStatus(st) {
+  if (!_modalCpf) return;
+  updateStatusBtns(st);
+  await fetch('/api/inadimplencia/gestao/' + encodeURIComponent(_modalCpf), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ status_gestao: st, nome: _modalNome })
+  });
+  // Update in local data
+  if (_dados && _dados.ativos) {
+    var item = _dados.ativos.find(function(a){return a.cpf===_modalCpf;});
+    if (item) item.statusGestao = st;
+  }
+  renderTabela();
+}
+
+async function salvarObs() {
+  if (!_modalCpf) return;
+  var obs = document.getElementById('m-obs').value;
+  await fetch('/api/inadimplencia/gestao/' + encodeURIComponent(_modalCpf), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ observacao: obs, nome: _modalNome })
+  });
+  if (_dados && _dados.ativos) {
+    var item = _dados.ativos.find(function(a){return a.cpf===_modalCpf;});
+    if (item) item.observacao = obs;
+  }
+}
+
+async function registrarAcao() {
+  if (!_modalCpf) return;
+  var tipo      = document.getElementById('m-tipo').value;
+  var resultado = document.getElementById('m-resultado').value;
+  var notas     = document.getElementById('m-notas').value;
+
+  await fetch('/api/inadimplencia/gestao/' + encodeURIComponent(_modalCpf) + '/acao', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tipo, resultado, notas, nome: _modalNome })
+  });
+
+  document.getElementById('m-notas').value = '';
+
+  // Auto-update local status if PAGO
+  if (resultado === 'PAGO' && _dados && _dados.ativos) {
+    var item = _dados.ativos.find(function(a){return a.cpf===_modalCpf;});
+    if (item) {
+      item.statusGestao = 'RECUPERADO';
+      item.ultimaAcao = { tipo, resultado, data: new Date().toISOString(), notas };
+    }
+    updateStatusBtns('RECUPERADO');
+    renderTabela();
+  } else if (_dados && _dados.ativos) {
+    var item = _dados.ativos.find(function(a){return a.cpf===_modalCpf;});
+    if (item) item.ultimaAcao = { tipo, resultado, data: new Date().toISOString(), notas };
+    renderTabela();
+  }
+
+  await loadHistory(_modalCpf);
+}
+
+async function loadHistory(cpf) {
+  var wrap = document.getElementById('m-history');
+  wrap.innerHTML = '<div class="history-empty">Carregando...</div>';
+  try {
+    var acoes = await fetch('/api/inadimplencia/gestao/' + encodeURIComponent(cpf) + '/acoes').then(function(r){return r.json();});
+    if (!acoes.length) {
+      wrap.innerHTML = '<div class="history-empty">Sem ações registradas.</div>';
+      return;
+    }
+    wrap.innerHTML = acoes.map(function(a) {
+      var cor = RESULT_COLORS[a.resultado] || '#475569';
+      return '<div class="history-item">' +
+        '<div class="history-dot" style="background:'+cor+'"></div>' +
+        '<div class="history-info">' +
+          '<div class="history-main"><strong>'+(TIPO_LABEL[a.tipo]||a.tipo)+'</strong> · <span style="color:'+cor+'">'+(RESULT_LABEL[a.resultado]||a.resultado)+'</span></div>' +
+          (a.notas ? '<div class="history-notas">'+esc(a.notas)+'</div>' : '') +
+        '</div>' +
+        '<div class="history-date">'+fmtDateISO(a.data_acao)+'</div>' +
+        '</div>';
+    }).join('');
+  } catch(e) {
+    wrap.innerHTML = '<div class="history-empty">Erro ao carregar histórico.</div>';
+  }
+}
+
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeModal(); });
 
 carregar(false);
 </script>

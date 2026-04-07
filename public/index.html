@@ -159,6 +159,9 @@
       <button class="nav-item" onclick="openTool(this,'https://auditoria.sahl.com.br/alunos','🎓','Alunos / Pagamentos')">
         <span class="nav-icon">🎓</span><span class="nav-name">Alunos / Pagamentos</span><span class="nav-dot"></span>
       </button>
+      <button class="nav-item" onclick="openTool(this,'/recebiveis','📈','Recebíveis do Dia')">
+        <span class="nav-icon">📈</span><span class="nav-name">Recebíveis do Dia</span><span class="nav-dot"></span>
+      </button>
       <button class="nav-item" onclick="openTool(this,'/inadimplencia','🚨','Inadimplência')">
         <span class="nav-icon">🚨</span><span class="nav-name">Inadimplência</span><span class="nav-dot"></span>
       </button>
@@ -240,6 +243,10 @@
       <div class="wcard" onclick="document.querySelector('[onclick*=\"Cobrança Ativa\"]').click()">
         <div class="wcard-top"><div class="wcard-icon amber">💰</div><div class="wcard-name">Cobrança Ativa</div></div>
         <div class="wcard-desc">Disparo controlado de cobranças via WhatsApp com IA.</div>
+      </div>
+      <div class="wcard" onclick="document.querySelector('[onclick*=\"Recebíveis\"]').click()">
+        <div class="wcard-top"><div class="wcard-icon green">📈</div><div class="wcard-name">Recebíveis do Dia</div></div>
+        <div class="wcard-desc">Esperado × recebido × vencido. Monitoramento diário de mensalidades.</div>
       </div>
       <div class="wcard" onclick="document.querySelector('[onclick*=\"Avulsa\"]').click()">
         <div class="wcard-top"><div class="wcard-icon green">🧾</div><div class="wcard-name">Cobrança Avulsa</div></div>
