@@ -608,13 +608,10 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
   const detalhes = [];
   for (const row of clientes) {
     try {
-      // Janela de inadimplência: até 6 meses antes da entrada até a data de resolução
       const dataEntrada   = new Date(row.data_entrada  || row.data_resolucao || new Date());
       const dataResolucao = new Date(row.data_resolucao || new Date());
-      const limiteInferior = new Date(dataEntrada);
-      limiteInferior.setMonth(limiteInferior.getMonth() - 6);
-      const dueDateMin = limiteInferior.toISOString().slice(0, 10); // YYYY-MM-DD
-      const dueDateMax = dataResolucao.toISOString().slice(0, 10);
+      const dueDateMax    = dataResolucao.toISOString().slice(0, 10);
+      const entradaStr    = dataEntrada.toISOString().slice(0, 10); // YYYY-MM-DD
 
       // Busca o customer pelo CPF no Asaas
       const cs = await httpsGet('api.asaas.com', `/v3/customers?cpfCnpj=${row.cpf}`, headers);
@@ -624,13 +621,13 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
       }
       const customerId = cs.data[0].id;
 
-      // Busca pagamentos pagos (RECEIVED, CONFIRMED) e OVERDUE dentro da janela
+      // Busca todos os pagamentos com vencimento até a data de resolução
       let allPayments = [];
       for (const status of ['RECEIVED', 'CONFIRMED', 'OVERDUE']) {
         let offset = 0;
         while (true) {
           const r = await httpsGet('api.asaas.com',
-            `/v3/payments?customer=${customerId}&status=${status}&dueDateGe=${dueDateMin}&dueDateLe=${dueDateMax}&limit=100&offset=${offset}`, headers);
+            `/v3/payments?customer=${customerId}&status=${status}&dueDateLe=${dueDateMax}&limit=100&offset=${offset}`, headers);
           if (!r.data || !r.data.length) break;
           allPayments = allPayments.concat(r.data);
           if (!r.hasMore) break;
@@ -638,11 +635,18 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
         }
       }
 
-      const todos = allPayments.filter(p => isMensalidade(p.description));
-      const valor = todos.reduce((s, p) => s + (p.value || 0), 0);
+      // Só conta o que estava em aberto quando o cliente entrou na lista:
+      // paymentDate ausente (ainda não pago) ou paymentDate >= data_entrada (pago após entrar)
+      const emAberto = allPayments.filter(p => {
+        if (!isMensalidade(p.description)) return false;
+        if (!p.paymentDate) return true;              // OVERDUE sem pagamento
+        return p.paymentDate >= entradaStr;           // pago depois de entrar na lista
+      });
+
+      const valor = emAberto.reduce((s, p) => s + (p.value || 0), 0);
 
       db.prepare(`UPDATE gestao_clientes SET valor_total=? WHERE cpf=?`).run(valor, row.cpf);
-      detalhes.push({ cpf: row.cpf, nome: row.nome, valor, dueDateMin, dueDateMax });
+      detalhes.push({ cpf: row.cpf, nome: row.nome, valor });
     } catch (e) {
       detalhes.push({ cpf: row.cpf, nome: row.nome, valor: 0, erro: e.message });
     }
