@@ -621,13 +621,13 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
       }
       const customerId = cs.data[0].id;
 
-      // Busca todos os pagamentos com vencimento até a data de resolução
+      // Busca pagamentos com vencimento até data_entrada (já estava vencido quando entrou)
       let allPayments = [];
       for (const status of ['RECEIVED', 'CONFIRMED', 'OVERDUE']) {
         let offset = 0;
         while (true) {
           const r = await httpsGet('api.asaas.com',
-            `/v3/payments?customer=${customerId}&status=${status}&dueDateLe=${dueDateMax}&limit=100&offset=${offset}`, headers);
+            `/v3/payments?customer=${customerId}&status=${status}&dueDateLe=${entradaStr}&limit=100&offset=${offset}`, headers);
           if (!r.data || !r.data.length) break;
           allPayments = allPayments.concat(r.data);
           if (!r.hasMore) break;
@@ -635,12 +635,12 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
         }
       }
 
-      // Só conta o que estava em aberto quando o cliente entrou na lista:
-      // paymentDate ausente (ainda não pago) ou paymentDate >= data_entrada (pago após entrar)
+      // Exclui apenas pagamentos com paymentDate confirmado antes da entrada
+      // (CONFIRMED sem paymentDate = estava em aberto quando entrou)
       const emAberto = allPayments.filter(p => {
         if (!isMensalidade(p.description)) return false;
-        if (!p.paymentDate) return true;              // OVERDUE sem pagamento
-        return p.paymentDate >= entradaStr;           // pago depois de entrar na lista
+        if (p.paymentDate && p.paymentDate < entradaStr) return false;
+        return true;
       });
 
       const valor = emAberto.reduce((s, p) => s + (p.value || 0), 0);
