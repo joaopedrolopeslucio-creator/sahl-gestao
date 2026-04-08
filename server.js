@@ -615,28 +615,21 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
       }
       const customerId = cs.data[0].id;
 
-      // Busca pagamentos RECEIVED desse customer
-      let payments = [], offset = 0;
-      while (true) {
-        const r = await httpsGet('api.asaas.com',
-          `/v3/payments?customer=${customerId}&status=RECEIVED&limit=100&offset=${offset}`, headers);
-        if (!r.data || !r.data.length) break;
-        payments = payments.concat(r.data);
-        if (!r.hasMore) break;
-        offset += 100;
-      }
-      // Também busca OVERDUE (caso ainda tenha alguma pendente)
-      let overdueP = [], offsetO = 0;
-      while (true) {
-        const r = await httpsGet('api.asaas.com',
-          `/v3/payments?customer=${customerId}&status=OVERDUE&limit=100&offset=${offsetO}`, headers);
-        if (!r.data || !r.data.length) break;
-        overdueP = overdueP.concat(r.data);
-        if (!r.hasMore) break;
-        offsetO += 100;
+      // Busca pagamentos pagos (RECEIVED ou CONFIRMED) e OVERDUE desse customer
+      let allPayments = [];
+      for (const status of ['RECEIVED', 'CONFIRMED', 'OVERDUE']) {
+        let offset = 0;
+        while (true) {
+          const r = await httpsGet('api.asaas.com',
+            `/v3/payments?customer=${customerId}&status=${status}&limit=100&offset=${offset}`, headers);
+          if (!r.data || !r.data.length) break;
+          allPayments = allPayments.concat(r.data);
+          if (!r.hasMore) break;
+          offset += 100;
+        }
       }
 
-      const todos = [...payments, ...overdueP].filter(p => isMensalidade(p.description));
+      const todos = allPayments.filter(p => isMensalidade(p.description));
       const valor = todos.reduce((s, p) => s + (p.value || 0), 0);
 
       db.prepare(`UPDATE gestao_clientes SET valor_total=? WHERE cpf=?`).run(valor, row.cpf);
