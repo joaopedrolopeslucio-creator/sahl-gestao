@@ -472,7 +472,7 @@ app.get('/api/inadimplencia/gestao', async (req, res) => {
     const valorMap = Object.fromEntries(todosOverdue.filter(a => a.cpf).map(a => [a.cpf, a.total]));
 
     const pendentesDb = db.prepare(
-      `SELECT cpf FROM gestao_clientes WHERE status_gestao NOT IN ('RECUPERADO','PERDIDO')`
+      `SELECT cpf, valor_total FROM gestao_clientes WHERE status_gestao NOT IN ('RECUPERADO','PERDIDO')`
     ).all();
     const nowAuto = new Date().toISOString();
     for (const row of pendentesDb) {
@@ -575,7 +575,7 @@ app.get('/api/inadimplencia/gestao/:cpf/acoes', (req, res) => {
 app.get('/api/inadimplencia/recuperados', (req, res) => {
   const rows = db.prepare(`
     SELECT g.*,
-      CAST((julianday(COALESCE(g.data_resolucao, datetime('now'))) - julianday(g.data_entrada)) AS INTEGER) as dias_para_recuperar,
+      CAST((julianday(substr(COALESCE(g.data_resolucao, datetime('now')), 1, 19)) - julianday(substr(g.data_entrada, 1, 19))) AS INTEGER) as dias_para_recuperar,
       (SELECT tipo FROM acoes_inadimplencia WHERE cpf=g.cpf ORDER BY data_acao DESC LIMIT 1) as ultimo_canal,
       (SELECT COUNT(*) FROM acoes_inadimplencia WHERE cpf=g.cpf) as num_acoes
     FROM gestao_clientes g
@@ -588,6 +588,65 @@ app.get('/api/inadimplencia/recuperados', (req, res) => {
     ? Math.round(comTempo.reduce((s, r) => s + r.dias_para_recuperar, 0) / comTempo.length)
     : 0;
   res.json({ resumo: { count: rows.length, total, tempoMedio }, clientes: rows });
+});
+
+// ─── Correção histórica: popula valor_total dos recuperados com valor 0 ───────
+app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
+  const zerados = db.prepare(
+    `SELECT cpf, nome FROM gestao_clientes WHERE status_gestao='RECUPERADO' AND (valor_total IS NULL OR valor_total = 0)`
+  ).all();
+
+  if (!zerados.length) return res.json({ ok: true, atualizados: 0, detalhes: [] });
+
+  const headers = { 'access_token': ASAAS_KEY };
+  const isMensalidade = desc => {
+    const d = (desc || '').toLowerCase();
+    return !d.startsWith('reserva de') && !d.startsWith('parcela');
+  };
+
+  const detalhes = [];
+  for (const row of zerados) {
+    try {
+      // Busca o customer pelo CPF no Asaas
+      const cs = await httpsGet('api.asaas.com', `/v3/customers?cpfCnpj=${row.cpf}`, headers);
+      if (!cs.data || !cs.data.length) {
+        detalhes.push({ cpf: row.cpf, nome: row.nome, valor: 0, erro: 'cliente não encontrado no Asaas' });
+        continue;
+      }
+      const customerId = cs.data[0].id;
+
+      // Busca pagamentos RECEIVED desse customer
+      let payments = [], offset = 0;
+      while (true) {
+        const r = await httpsGet('api.asaas.com',
+          `/v3/payments?customer=${customerId}&status=RECEIVED&limit=100&offset=${offset}`, headers);
+        if (!r.data || !r.data.length) break;
+        payments = payments.concat(r.data);
+        if (!r.hasMore) break;
+        offset += 100;
+      }
+      // Também busca OVERDUE (caso ainda tenha alguma pendente)
+      let overdueP = [], offsetO = 0;
+      while (true) {
+        const r = await httpsGet('api.asaas.com',
+          `/v3/payments?customer=${customerId}&status=OVERDUE&limit=100&offset=${offsetO}`, headers);
+        if (!r.data || !r.data.length) break;
+        overdueP = overdueP.concat(r.data);
+        if (!r.hasMore) break;
+        offsetO += 100;
+      }
+
+      const todos = [...payments, ...overdueP].filter(p => isMensalidade(p.description));
+      const valor = todos.reduce((s, p) => s + (p.value || 0), 0);
+
+      db.prepare(`UPDATE gestao_clientes SET valor_total=? WHERE cpf=?`).run(valor, row.cpf);
+      detalhes.push({ cpf: row.cpf, nome: row.nome, valor });
+    } catch (e) {
+      detalhes.push({ cpf: row.cpf, nome: row.nome, valor: 0, erro: e.message });
+    }
+  }
+
+  res.json({ ok: true, atualizados: detalhes.filter(d => !d.erro).length, detalhes });
 });
 
 // ─── Cobrança Avulsa ──────────────────────────────────────────────────────────
