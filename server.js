@@ -590,13 +590,14 @@ app.get('/api/inadimplencia/recuperados', (req, res) => {
   res.json({ resumo: { count: rows.length, total, tempoMedio }, clientes: rows });
 });
 
-// ─── Correção histórica: popula valor_total dos recuperados com valor 0 ───────
+// ─── Correção histórica: popula valor_total dos recuperados ───────────────────
 app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
-  const zerados = db.prepare(
-    `SELECT cpf, nome FROM gestao_clientes WHERE status_gestao='RECUPERADO' AND (valor_total IS NULL OR valor_total = 0)`
+  // Roda em todos os recuperados (não só zerados) para corrigir valores inflados
+  const clientes = db.prepare(
+    `SELECT cpf, nome, data_entrada, data_resolucao FROM gestao_clientes WHERE status_gestao='RECUPERADO'`
   ).all();
 
-  if (!zerados.length) return res.json({ ok: true, atualizados: 0, detalhes: [] });
+  if (!clientes.length) return res.json({ ok: true, atualizados: 0, detalhes: [] });
 
   const headers = { 'access_token': ASAAS_KEY };
   const isMensalidade = desc => {
@@ -605,8 +606,16 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
   };
 
   const detalhes = [];
-  for (const row of zerados) {
+  for (const row of clientes) {
     try {
+      // Janela de inadimplência: até 6 meses antes da entrada até a data de resolução
+      const dataEntrada   = new Date(row.data_entrada  || row.data_resolucao || new Date());
+      const dataResolucao = new Date(row.data_resolucao || new Date());
+      const limiteInferior = new Date(dataEntrada);
+      limiteInferior.setMonth(limiteInferior.getMonth() - 6);
+      const dueDateMin = limiteInferior.toISOString().slice(0, 10); // YYYY-MM-DD
+      const dueDateMax = dataResolucao.toISOString().slice(0, 10);
+
       // Busca o customer pelo CPF no Asaas
       const cs = await httpsGet('api.asaas.com', `/v3/customers?cpfCnpj=${row.cpf}`, headers);
       if (!cs.data || !cs.data.length) {
@@ -615,13 +624,13 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
       }
       const customerId = cs.data[0].id;
 
-      // Busca pagamentos pagos (RECEIVED ou CONFIRMED) e OVERDUE desse customer
+      // Busca pagamentos pagos (RECEIVED, CONFIRMED) e OVERDUE dentro da janela
       let allPayments = [];
       for (const status of ['RECEIVED', 'CONFIRMED', 'OVERDUE']) {
         let offset = 0;
         while (true) {
           const r = await httpsGet('api.asaas.com',
-            `/v3/payments?customer=${customerId}&status=${status}&limit=100&offset=${offset}`, headers);
+            `/v3/payments?customer=${customerId}&status=${status}&dueDateGe=${dueDateMin}&dueDateLe=${dueDateMax}&limit=100&offset=${offset}`, headers);
           if (!r.data || !r.data.length) break;
           allPayments = allPayments.concat(r.data);
           if (!r.hasMore) break;
@@ -633,7 +642,7 @@ app.post('/api/inadimplencia/recuperados/fix-valores', async (req, res) => {
       const valor = todos.reduce((s, p) => s + (p.value || 0), 0);
 
       db.prepare(`UPDATE gestao_clientes SET valor_total=? WHERE cpf=?`).run(valor, row.cpf);
-      detalhes.push({ cpf: row.cpf, nome: row.nome, valor });
+      detalhes.push({ cpf: row.cpf, nome: row.nome, valor, dueDateMin, dueDateMax });
     } catch (e) {
       detalhes.push({ cpf: row.cpf, nome: row.nome, valor: 0, erro: e.message });
     }
