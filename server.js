@@ -127,7 +127,7 @@ app.delete('/api/downloads/:id', (req, res) => {
 
 // ─── Inadimplência ────────────────────────────────────────────────────────────
 const https = require('https');
-const ASAAS_KEY = '$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmMwMzg2YjMyLTI5YTYtNDk1Ny1iNTZiLWIyZjg0OWUwZjk0Nzo6JGFhY2hfMTk1NTA1NmMtYmViYi00MDZhLWE2MGUtMWM2NzNlNjAyYTQz';
+const ASAAS_KEY = '$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OjYzNGFlYzVlLWUwYjUtNGE0Mi05YzcxLTM1NjIxOTQwODJiYTo6JGFhY2hfNjlkYjM2YWUtYmQ4MC00NGY3LWE0NTUtNmRiMTBmYTQ1Y2Yw';
 
 let _inadCache = null;
 let _inadCacheTs = 0;
